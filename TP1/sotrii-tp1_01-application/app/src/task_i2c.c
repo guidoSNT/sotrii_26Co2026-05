@@ -101,9 +101,11 @@ void task_i2c_tx(void *parameters)
 
 		task_i2c_tx_dta_t task_i2c_tx_dta;
 
-		cycle_counter_reset();
+
 
 		xQueueReceive(p_task_i2c_tx_dta->queue_tx, &task_i2c_tx_dta, portMAX_DELAY);
+
+		cycle_counter_reset();
 
 		HAL_I2C_Master_Transmit(p_task_i2c_tx_dta->device_id, (task_i2c_tx_dta.address << 1), &task_i2c_tx_dta.data, sizeof(task_i2c_tx_dta.data), HAL_MAX_DELAY);
 
@@ -131,25 +133,27 @@ void task_i2c_rx(void *parameters)
 	/* As per most tasks, this task is implemented in an infinite loop. */
 	for (;;)
 	{
-		task_i2c_tx_dta_t task_i2c_rx_dta = {.address = 0x27, .data = 0x0A};
+		task_i2c_rx_dta_t task_i2c_rx_dta = {.address = 0x48, .data = 0x00};
+
+		uint8_t dt[2];
 
 		/* Update Task Counter */
 		g_task_xxxx_rx_cnt++;
 
 		cycle_counter_reset();
 
-		HAL_GPIO_TogglePin(LED_A_PORT, LED_A_PIN);
-
-		g_task_xxxx_rx_runtime_us = cycle_counter_get_time_us();
-
-		if(HAL_OK != HAL_I2C_Master_Receive(p_task_i2c_rx_dta->device_id, (task_i2c_rx_dta.address << 1), &task_i2c_rx_dta.data, sizeof(task_i2c_rx_dta.data), HAL_MAX_DELAY)){
+		if(HAL_OK != HAL_I2C_Master_Receive(p_task_i2c_rx_dta->device_id, (task_i2c_rx_dta.address << 1), dt, 2, HAL_MAX_DELAY)){
 			continue;
 		}
 
-		/* Print out: Wait 250mS */
-		LOGGER_INFO("Received from slave (0x%X): %d",task_i2c_rx_dta.address,task_i2c_rx_dta.data);
-		xQueueSend(p_task_i2c_rx_dta->queue_rx, &task_i2c_rx_dta.data, portMAX_DELAY);
+		g_task_xxxx_rx_runtime_us = cycle_counter_get_time_us();
 
+		task_i2c_rx_dta.data = (dt[0] << 8) | dt[1]; //debo hacer un desplazamiento de 8 posiciones porque el primer byte que se recibe es el MSB y luego hago una OR con el segundo byte (data[1])
+
+		/* Print out: Wait 250mS */
+		xQueueSend(p_task_i2c_rx_dta->queue_rx, &task_i2c_rx_dta.data , portMAX_DELAY);
+
+		LOGGER_INFO(p_task_i2c_rx_wait_250mS);
 		vTaskDelay(TASK_XXXX_DEL_MAX);
 	}
 }

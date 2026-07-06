@@ -78,7 +78,7 @@ void open_i2c(I2C_HandleTypeDef *h_i2c_device)
 	configASSERT(NULL != p_task_i2c_dta->queue_tx);
 	vQueueAddToRegistry(p_task_i2c_dta->queue_tx, "Task I2C Tx Queue Handle");
 
-	p_task_i2c_dta->queue_rx = xQueueCreate(10, sizeof(uint8_t));
+	p_task_i2c_dta->queue_rx = xQueueCreate(10, sizeof(uint16_t)); //los datos de los registros del TMP117 son de 16 bits
 	configASSERT(NULL != p_task_i2c_dta->queue_rx);
 	vQueueAddToRegistry(p_task_i2c_dta->queue_rx, "Task I2C Rx Queue Handle");
 
@@ -132,20 +132,20 @@ void write_i2c(I2C_HandleTypeDef *h_i2c_device, uint16_t dev_address, uint8_t de
 	}
 }
 
-void read_i2c(I2C_HandleTypeDef *h_i2c_device, uint8_t *data)
+void read_i2c(I2C_HandleTypeDef *h_i2c_device, uint16_t* data)
 {
 	task_i2c_dta_t *p_task_i2c_dta = &task_i2c_dta;
+	if(data == NULL){return;}
 
 	p_task_i2c_dta->device_id = h_i2c_device;
 
 	// Check which version of the i2c triggered this function
 	if (p_task_i2c_dta->device_id == h_i2c_device)
 	{
-		task_i2c_tx_dta_t task_i2c_rx_dta;
 
-		xQueueReceive(p_task_i2c_dta->queue_rx, &task_i2c_rx_dta.data, portMAX_DELAY);
+		xQueueReceive(p_task_i2c_dta->queue_rx, data, portMAX_DELAY);
 
-		*data = task_i2c_rx_dta.data;
+		//data = task_i2c_rx_dta.data;
 		return;
 	}
 	*data = 0;

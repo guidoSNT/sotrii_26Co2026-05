@@ -64,6 +64,12 @@ typedef struct
 	uint8_t		data;
 } task_i2c_tx_dta_t;
 
+typedef struct
+{
+	uint16_t	address;
+	uint16_t		data;
+} task_i2c_rx_dta_t;
+
 /********************** external data declaration ****************************/
 
 /********************** external functions declaration ***********************/
