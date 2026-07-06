@@ -50,7 +50,7 @@
 #define G_TASK_SENDER_CNT_INI	0ul
 
 #define TASK_SENDER_DEL_ZERO	(pdMS_TO_TICKS(0ul))
-#define TASK_SENDER_DEL_MAX		(pdMS_TO_TICKS(250ul))
+#define TASK_SENDER_DEL_MAX		(pdMS_TO_TICKS(2500ul))
 
 /********************** internal data declaration ****************************/
 

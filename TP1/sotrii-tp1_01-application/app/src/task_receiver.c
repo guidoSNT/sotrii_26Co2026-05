@@ -76,11 +76,16 @@ void task_receiver(void *parameters)
 	/* As per most tasks, this task is implemented in an infinite loop. */
 	for (;;)
     {
+		uint8_t data = 0;
 		/* Update Task Counter */
 		g_task_receiver_cnt++;
 
+		read_i2c(&hi2c1, &data);
+
     	/* Print out: Wait 250mS */
-		LOGGER_INFO(p_task_receiver_wait_250mS);
+		if(data != 0){
+			LOGGER_INFO("received: %d",data);
+		}
 		vTaskDelay(TASK_RECEIVER_DEL_MAX);
 	}
 }

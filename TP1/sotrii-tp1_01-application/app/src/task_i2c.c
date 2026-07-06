@@ -118,8 +118,7 @@ void task_i2c_tx(void *parameters)
 /* Task I2C RX thread */
 void task_i2c_rx(void *parameters)
 {
-	/* Prevent unused argument(s) compilation warning */
-	UNUSED(parameters);
+	task_i2c_dta_t *p_task_i2c_rx_dta = (task_i2c_dta_t *)parameters;
 
 	/*  Declare & Initialize Task Function variables */
 	g_task_xxxx_rx_cnt = G_TASK_XXXX_CNT_INI;
@@ -132,6 +131,8 @@ void task_i2c_rx(void *parameters)
 	/* As per most tasks, this task is implemented in an infinite loop. */
 	for (;;)
 	{
+		task_i2c_tx_dta_t task_i2c_rx_dta = {.address = 0x27, .data = 0x0A};
+
 		/* Update Task Counter */
 		g_task_xxxx_rx_cnt++;
 
@@ -141,8 +142,14 @@ void task_i2c_rx(void *parameters)
 
 		g_task_xxxx_rx_runtime_us = cycle_counter_get_time_us();
 
-    	/* Print out: Wait 250mS */
-		LOGGER_INFO(p_task_i2c_rx_wait_250mS);
+		if(HAL_OK != HAL_I2C_Master_Receive(p_task_i2c_rx_dta->device_id, (task_i2c_rx_dta.address << 1), &task_i2c_rx_dta.data, sizeof(task_i2c_rx_dta.data), HAL_MAX_DELAY)){
+			continue;
+		}
+
+		/* Print out: Wait 250mS */
+		LOGGER_INFO("Received from slave (0x%X): %d",task_i2c_rx_dta.address,task_i2c_rx_dta.data);
+		xQueueSend(p_task_i2c_rx_dta->queue_rx, &task_i2c_rx_dta.data, portMAX_DELAY);
+
 		vTaskDelay(TASK_XXXX_DEL_MAX);
 	}
 }

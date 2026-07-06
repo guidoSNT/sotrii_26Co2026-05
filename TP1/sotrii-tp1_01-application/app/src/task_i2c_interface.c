@@ -132,10 +132,23 @@ void write_i2c(I2C_HandleTypeDef *h_i2c_device, uint16_t dev_address, uint8_t de
 	}
 }
 
-void read_i2c(I2C_HandleTypeDef *h_i2c_device)
+void read_i2c(I2C_HandleTypeDef *h_i2c_device, uint8_t *data)
 {
-	/* Prevent unused argument(s) compilation warning */
-	UNUSED(h_i2c_device);
+	task_i2c_dta_t *p_task_i2c_dta = &task_i2c_dta;
+
+	p_task_i2c_dta->device_id = h_i2c_device;
+
+	// Check which version of the i2c triggered this function
+	if (p_task_i2c_dta->device_id == h_i2c_device)
+	{
+		task_i2c_tx_dta_t task_i2c_rx_dta;
+
+		xQueueReceive(p_task_i2c_dta->queue_rx, &task_i2c_rx_dta.data, portMAX_DELAY);
+
+		*data = task_i2c_rx_dta.data;
+		return;
+	}
+	*data = 0;
 }
 
 void ioctl_i2c(I2C_HandleTypeDef *h_i2c_device)
