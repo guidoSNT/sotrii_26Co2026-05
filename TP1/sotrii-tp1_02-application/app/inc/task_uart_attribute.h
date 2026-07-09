@@ -46,10 +46,21 @@ extern "C" {
 
 /********************** typedef **********************************************/
 /* Structure of Task */
+typedef struct {
+	UART_HandleTypeDef *device_id;
 
+	TaskHandle_t task_tx;
+	QueueHandle_t queue_tx;
 
+	TaskHandle_t task_rx;
+	QueueHandle_t queue_rx;
+} task_uart_dta_t;
+
+typedef struct {
+	uint8_t *msg;
+	size_t msg_len;
+} task_uart_tx_dta_t;
 /* Structure of UART Tx */
-
 
 /********************** external data declaration ****************************/
 

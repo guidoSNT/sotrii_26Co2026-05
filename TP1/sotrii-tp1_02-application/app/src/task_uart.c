@@ -63,8 +63,8 @@ void task_uart_tx(void *parameters);
 void task_uart_rx(void *parameters);
 
 /********************** internal data definition *****************************/
-const char *p_task_uart_tx_wait_250mS	= "   ==> Task UART TX - Wait:   250mS";
-const char *p_task_uart_rx_wait_250mS	= "   ==> Task UART RX - Wait:   250mS";
+const char *p_task_uart_tx_wait_250mS = "   ==> Task UART TX - Wait:   250mS";
+const char *p_task_uart_rx_wait_250mS = "   ==> Task UART RX - Wait:   250mS";
 
 /********************** external data declaration ****************************/
 uint32_t g_task_xxxx_tx_cnt;
@@ -75,10 +75,10 @@ uint32_t g_task_xxxx_rx_runtime_us;
 
 /********************** external functions definition ************************/
 /* Task UART TX thread */
-void task_uart_tx(void *parameters)
-{
+void task_uart_tx(void *parameters) {
 	/* Prevent unused argument(s) compilation warning */
-	UNUSED(parameters);
+	task_uart_dta_t *p_task_uart_tx_dta = (task_uart_dta_t*) parameters;
+	task_uart_tx_dta_t task_uart_tx_dta;
 
 	/*  Declare & Initialize Task Function variables */
 	g_task_xxxx_tx_cnt = G_TASK_XXXX_CNT_INI;
@@ -86,31 +86,31 @@ void task_uart_tx(void *parameters)
 
 	/* Print out: Task Initialized */
 	LOGGER_INFO(" ");
-	LOGGER_INFO("%s is running - Tick [mS] = %3d", pcTaskGetName(NULL), (int)xTaskGetTickCount());
+	LOGGER_INFO("%s is running - Tick [mS] = %3d", pcTaskGetName(NULL),
+			(int )xTaskGetTickCount());
 
 	/* As per most tasks, this task is implemented in an infinite loop. */
-	for (;;)
-	{
+	for (;;) {
 		/* Update Task Counter */
 		g_task_xxxx_tx_cnt++;
 
 		cycle_counter_reset();
 
-		HAL_GPIO_TogglePin(LED_A_PORT, LED_A_PIN);
-
 		g_task_xxxx_tx_runtime_us = cycle_counter_get_time_us();
 
-    	/* Print out: Wait 250mS */
-		LOGGER_INFO(p_task_uart_tx_wait_250mS);
+		if(pdPASS !=xQueueReceive(p_task_uart_dta->queue_tx, &task_uart_tx_dta , portMAX_DELAY)) continue;
+		HAL_UART_Transmit_IT(p_task_uart_tx_dta->device_id, task_uart_tx_dta.msg ,task_uart_tx_dta.msg_len);
+
+		/* Print out: Wait 250mS */
+				LOGGER_INFO(p_task_uart_tx_wait_250mS);
 		vTaskDelay(TASK_XXXX_DEL_MAX);
 	}
 }
 
+
 /* Task UART RX thread */
-void task_uart_rx(void *parameters)
-{
-	/* Prevent unused argument(s) compilation warning */
-	UNUSED(parameters);
+void task_uart_rx(void *parameters) {
+	task_uart_dta_t *p_task_uart_rx_dta = (task_uart_dta_t*) parameters;
 
 	/*  Declare & Initialize Task Function variables */
 	g_task_xxxx_rx_cnt = G_TASK_XXXX_CNT_INI;
@@ -118,21 +118,22 @@ void task_uart_rx(void *parameters)
 
 	/* Print out: Task Initialized */
 	LOGGER_INFO(" ");
-	LOGGER_INFO("%s is running - Tick [mS] = %3d", pcTaskGetName(NULL), (int)xTaskGetTickCount());
+	LOGGER_INFO("%s is running - Tick [mS] = %3d", pcTaskGetName(NULL),
+			(int )xTaskGetTickCount());
 
 	/* As per most tasks, this task is implemented in an infinite loop. */
-	for (;;)
-	{
+	for (;;) {
+		uint8_t test[200];
 		/* Update Task Counter */
 		g_task_xxxx_rx_cnt++;
 
 		cycle_counter_reset();
 
-		HAL_GPIO_TogglePin(LED_A_PORT, LED_A_PIN);
-
 		g_task_xxxx_rx_runtime_us = cycle_counter_get_time_us();
 
-    	/* Print out: Wait 250mS */
+		HAL_UART_Receive_IT(p_task_uart_rx_dta->device_id, test, sizeof(test));
+
+		/* Print out: Wait 250mS */
 		LOGGER_INFO(p_task_uart_rx_wait_250mS);
 		vTaskDelay(TASK_XXXX_DEL_MAX);
 	}

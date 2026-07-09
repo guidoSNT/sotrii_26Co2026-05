@@ -42,6 +42,7 @@
 
 /* Application & Tasks includes */
 #include "board.h"
+#include "task_uart_attribute.h"
 
 /********************** macros and definitions *******************************/
 #define HAL_XXXX_CALLBACK_CNT_INI			0ul
@@ -57,49 +58,70 @@
 volatile bool hal_xxxx_callback_flag;
 volatile uint32_t hal_xxxx_callback_cnt;
 volatile uint32_t hal_xxxx_callback_runtime_us;
-
+extern task_uart_dta_t task_uart_dta;
 /********************** external functions definition ************************/
-void app_it_init(void)
-{
+void app_it_init(void) {
 	/* Init to be done */
 
 	/* Protect shared resource */
-	__asm("CPSID i");	/* disable interrupts */
+	__asm("CPSID i");
+	/* disable interrupts */
 
 	hal_xxxx_callback_flag = false;
 	hal_xxxx_callback_cnt = HAL_XXXX_CALLBACK_CNT_INI;
 	hal_xxxx_callback_runtime_us = HAL_XXXX_CALLBACK_RUNTIME_US_INI;
 
-	__asm("CPSIE i");	/* enable interrupts */
+	__asm("CPSIE i");
+	/* enable interrupts */
 }
 
 /**
-  * @brief  EXTI line detection callbacks.
-  * @param  GPIO_Pin Specifies the pins connected EXTI line
-  * @retval None
-  */
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
+ * @brief  EXTI line detection callbacks.
+ * @param  GPIO_Pin Specifies the pins connected EXTI line
+ * @retval None
+ */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	// Check which version of the gpio triggered this callback
-	if (GPIO_Pin == BTN_A_PIN)
-	{
+	if (GPIO_Pin == BTN_A_PIN) {
 		/* Work to be done. */
 	}
 }
 
 /**
-  * @brief  Tx Transfer completed callbacks.
-  * @param  huart  Pointer to a UART_HandleTypeDef structure that contains
-  *                the configuration information for the specified UART module.
-  * @retval None
-  */
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
-{
+ * @brief  Tx Transfer completed callbacks.
+ * @param  huart  Pointer to a UART_HandleTypeDef structure that contains
+ *                the configuration information for the specified UART module.
+ * @retval None
+ */
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 	// Check which version of the uart triggered this callback
-	if (huart->Instance == USART2)
-	{
+	if (huart->Instance == USART2) {
+		uint8_t *p_msg = NULL;
 		hal_xxxx_callback_flag = true;
 		hal_xxxx_callback_cnt++;
+		BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+		hal_xxxx_callback_runtime_us = cycle_counter_get_time_us();
+
+		if (pdPASS == xQueueReceiveFromISR(p_task_uart_dta->queue_tx, &p_msg, &xHigherPriorityTaskWoken)) {
+			free(p_msg);
+		}
+	}
+}
+
+/**
+ * @brief  Rx Received completed callbacks.
+ * @param  huart  Pointer to a UART_HandleTypeDef structure that contains
+ *                the configuration information for the specified UART module.
+ * @retval None
+ */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+	// Check which version of the uart triggered this callback
+	if (huart->Instance == USART2) {
+		hal_xxxx_callback_flag = true;
+		hal_xxxx_callback_cnt++;
+
+		xQueueReceiveFromISR(p_task_uart_dta->queue_rx, pvBuffer,
+				pxHigherPriorityTaskWoken)
 
 		hal_xxxx_callback_runtime_us = cycle_counter_get_time_us();
 	}

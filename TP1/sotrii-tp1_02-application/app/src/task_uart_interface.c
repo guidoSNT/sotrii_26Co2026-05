@@ -52,7 +52,7 @@
 /********************** macros and definitions *******************************/
 
 /********************** internal data declaration ****************************/
-
+task_uart_dta_t task_uart_dta;
 /********************** internal data declaration ****************************/
 
 /********************** internal functions declaration ***********************/
@@ -63,32 +63,70 @@
 
 /********************** external functions definition ************************/
 /* Interface functions */
-void open_uart(UART_HandleTypeDef *h_uart_device)
-{
-	/* Prevent unused argument(s) compilation warning */
-	UNUSED(h_uart_device);
+void open_uart(UART_HandleTypeDef *h_uart_device) {
+	BaseType_t ret;
+	task_uart_dta_t *p_task_uart_dta = &task_uart_dta;
+
+	p_task_uart_dta->device_id = h_uart_device;
+
+	p_task_uart_dta->queue_tx = xQueueCreate(10, sizeof(task_uart_tx_dta_t));
+	configASSERT(NULL != p_task_uart_dta->queue_tx);
+	vQueueAddToRegistry(p_task_uart_dta->queue_tx, "Task UART Tx Queue Handle");
+
+	p_task_uart_dta->queue_rx = xQueueCreate(10, sizeof(uint8_t*));
+	configASSERT(NULL != p_task_uart_dta->queue_rx);
+	vQueueAddToRegistry(p_task_uart_dta->queue_rx, "Task UART Rx Queue Handle");
+
+	ret = xTaskCreate(task_uart_tx, "Task UART Tx", (configMINIMAL_STACK_SIZE),
+			(void*) p_task_uart_dta, (tskIDLE_PRIORITY + 1ul),
+			&p_task_uart_dta->task_tx);
+	configASSERT(pdPASS == ret);
+
+	ret = xTaskCreate(task_uart_rx, "Task UART Rx", (configMINIMAL_STACK_SIZE),
+			(void*) p_task_uart_dta, (tskIDLE_PRIORITY + 1ul),
+			&p_task_uart_dta->task_rx);
+	configASSERT(pdPASS == ret);
 }
 
-void release_uart(UART_HandleTypeDef *h_uart_device)
-{
-	/* Prevent unused argument(s) compilation warning */
-	UNUSED(h_uart_device);
+void release_uart(UART_HandleTypeDef *h_uart_device) {
+	task_uart_dta_t *p_task_uart_dta = &task_uart_dta;
+
+	p_task_uart_dta->device_id = h_uart_device;
+
+	// Check which version of the uart triggered this function
+	if (p_task_uart_dta->device_id == h_uart_device) {
+		vQueueUnregisterQueue(p_task_uart_dta->queue_tx);
+		vQueueDelete(p_task_uart_dta->queue_tx);
+		vQueueUnregisterQueue(p_task_uart_dta->queue_rx);
+		vQueueDelete(p_task_uart_dta->queue_rx);
+		vTaskDelete(p_task_uart_dta->task_tx);
+		vTaskDelete(p_task_uart_dta->task_rx);
+	}
 }
 
-void write_uart(UART_HandleTypeDef *h_uart_device)
-{
-	/* Prevent unused argument(s) compilation warning */
-	UNUSED(h_uart_device);
+void write_uart(UART_HandleTypeDef *h_uart_device, uint8_t *msg, size_t msg_len) {
+	if (msg == NULL || msg_len == 0)
+		return;
+	p_task_uart_dta->device_id = h_uart_device;
+
+	// Check which version of the uart triggered this function
+	if (p_task_uart_dta->device_id == h_uart_device) {
+		uint8_t *msg_cpy = malloc(msg_len);
+		memcpy(msg_cpy, msg, msg_len);
+		xQueueSend(p_task_uart_dta->queue_tx, &msg_cpy, portMAX_DELAY);
+	}
 }
 
-void read_uart(UART_HandleTypeDef *h_uart_device)
-{
-	/* Prevent unused argument(s) compilation warning */
-	UNUSED(h_uart_device);
+void read_uart(UART_HandleTypeDef *h_uart_device, char **p_mem) {
+	p_task_uart_dta->device_id = h_uart_device;
+
+	// Check which version of the uart triggered this function
+	if (p_task_uart_dta->device_id == h_uart_device) {
+		xQueueReceive(p_task_uart_dta->queue_rx, p_mem, portMAX_DELAY);
+	}
 }
 
-void ioctl_uart(UART_HandleTypeDef *h_uart_device)
-{
+void ioctl_uart(UART_HandleTypeDef *h_uart_device) {
 	/* Prevent unused argument(s) compilation warning */
 	UNUSED(h_uart_device);
 }
