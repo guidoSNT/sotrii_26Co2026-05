@@ -52,8 +52,8 @@ extern "C" {
 extern void open_uart(UART_HandleTypeDef *h_uart_device);
 extern void release_uart(UART_HandleTypeDef *h_uart_device);
 
-extern void write_uart(UART_HandleTypeDef *h_uart_device);
-extern void read_uart(UART_HandleTypeDef *h_uart_device);
+extern void write_uart(UART_HandleTypeDef *h_uart_device, uint8_t *msg, size_t msg_len);
+void read_uart(UART_HandleTypeDef *h_uart_device, uint8_t *msg, size_t msg_len);
 
 extern void ioctl_uart(UART_HandleTypeDef *h_uart_device);
 

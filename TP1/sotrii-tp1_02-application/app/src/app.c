@@ -111,16 +111,18 @@ void app_init(void)
 	/* Add threads, ... */
     BaseType_t ret;
 
+    char * data[16] = {0};
+    HAL_StatusTypeDef ret2 = HAL_UART_Receive(&huart2, data, 16, HAL_MAX_DELAY);
     /* Task Sender thread at priority 1 */
-    ret = xTaskCreate(task_sender,						/* Pointer to the function thats implement the task. */
-					  "Task Sender",					/* Text name for the task. This is to facilitate debugging only. */
-					  (2 * configMINIMAL_STACK_SIZE),	/* Stack depth in words. */
-					  NULL,								/* We are not using the task parameter. */
-					  (tskIDLE_PRIORITY + 1ul),			/* This task will run at priority 1. */
-					  &h_task_sender);					/* We are using a variable as task handle. */
+    //ret = xTaskCreate(task_sender,						/* Pointer to the function thats implement the task. */
+					  //"Task Sender",					/* Text name for the task. This is to facilitate debugging only. */
+					  //(2 * configMINIMAL_STACK_SIZE),	/* Stack depth in words. */
+					  //NULL,								/* We are not using the task parameter. */
+					  //(tskIDLE_PRIORITY + 1ul),			/* This task will run at priority 1. */
+					  //&h_task_sender);					/* We are using a variable as task handle. */
 
     /* Check the thread was created successfully. */
-    configASSERT(pdPASS == ret);
+    //configASSERT(pdPASS == ret);
 
     /* Task Receiver thread at priority 1 */
     ret = xTaskCreate(task_receiver,					/* Pointer to the function thats implement the task. */
@@ -131,7 +133,7 @@ void app_init(void)
 					  &h_task_receiver);				/* We are using a variable as task handle. */
 
     /* Check the thread was created successfully. */
-    configASSERT(pdPASS == ret);
+    //configASSERT(pdPASS == ret);
 
     /* Total amount of heap space that remains unallocated. Is also available
      * with xFreeBytesRemaining variable for heap management schemes 2 to 5.

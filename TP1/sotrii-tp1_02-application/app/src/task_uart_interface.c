@@ -82,10 +82,12 @@ void open_uart(UART_HandleTypeDef *h_uart_device) {
 			&p_task_uart_dta->task_tx);
 	configASSERT(pdPASS == ret);
 
-	ret = xTaskCreate(task_uart_rx, "Task UART Rx", (configMINIMAL_STACK_SIZE),
-			(void*) p_task_uart_dta, (tskIDLE_PRIORITY + 1ul),
-			&p_task_uart_dta->task_rx);
-	configASSERT(pdPASS == ret);
+	//ret = xTaskCreate(task_uart_rx, "Task UART Rx", (configMINIMAL_STACK_SIZE),(void*) p_task_uart_dta, (tskIDLE_PRIORITY + 1ul),&p_task_uart_dta->task_rx);
+	//configASSERT(pdPASS == ret);
+
+	p_task_uart_dta->ready_tx = xSemaphoreCreateBinary();
+	p_task_uart_dta->ready_rx = xSemaphoreCreateBinary();
+	xSemaphoreGive(p_task_uart_dta->ready_rx);
 }
 
 void release_uart(UART_HandleTypeDef *h_uart_device) {
@@ -101,28 +103,38 @@ void release_uart(UART_HandleTypeDef *h_uart_device) {
 		vQueueDelete(p_task_uart_dta->queue_rx);
 		vTaskDelete(p_task_uart_dta->task_tx);
 		vTaskDelete(p_task_uart_dta->task_rx);
+		vSemaphoreDelete(p_task_uart_dta->ready_tx);
+		vSemaphoreDelete(p_task_uart_dta->ready_rx);
 	}
 }
 
 void write_uart(UART_HandleTypeDef *h_uart_device, uint8_t *msg, size_t msg_len) {
 	if (msg == NULL || msg_len == 0)
 		return;
-	p_task_uart_dta->device_id = h_uart_device;
+	task_uart_dta.device_id = h_uart_device;
 
 	// Check which version of the uart triggered this function
-	if (p_task_uart_dta->device_id == h_uart_device) {
-		uint8_t *msg_cpy = malloc(msg_len);
-		memcpy(msg_cpy, msg, msg_len);
-		xQueueSend(p_task_uart_dta->queue_tx, &msg_cpy, portMAX_DELAY);
+	if (task_uart_dta.device_id == h_uart_device) {
+		task_uart_tx_dta_t uart_tx_dta = {0};
+		uart_tx_dta.msg = (uint8_t*) pvPortMalloc(msg_len);
+		uart_tx_dta.msg_len = msg_len;
+
+		memcpy(uart_tx_dta.msg,msg, uart_tx_dta.msg_len);
+		xQueueSend(task_uart_dta.queue_tx, &uart_tx_dta, portMAX_DELAY);
 	}
 }
 
-void read_uart(UART_HandleTypeDef *h_uart_device, char **p_mem) {
-	p_task_uart_dta->device_id = h_uart_device;
+void read_uart(UART_HandleTypeDef *h_uart_device, uint8_t *msg, size_t msg_len) {
+	if(msg ==NULL || msg_len<128) return;
+	task_uart_dta.device_id = h_uart_device;
 
 	// Check which version of the uart triggered this function
-	if (p_task_uart_dta->device_id == h_uart_device) {
-		xQueueReceive(p_task_uart_dta->queue_rx, p_mem, portMAX_DELAY);
+	if (task_uart_dta.device_id == h_uart_device) {
+		uint8_t * p_mem = NULL;
+		if(pdPASS == xQueueReceive(task_uart_dta.queue_rx, &p_mem, portMAX_DELAY)){
+			memcpy(msg, p_mem, 128);
+			vPortFree(p_mem);
+		}
 	}
 }
 

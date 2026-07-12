@@ -41,7 +41,9 @@ extern "C" {
 #endif
 
 /********************** inclusions *******************************************/
-
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
 /********************** macros ***********************************************/
 
 /********************** typedef **********************************************/
@@ -51,9 +53,11 @@ typedef struct {
 
 	TaskHandle_t task_tx;
 	QueueHandle_t queue_tx;
+	SemaphoreHandle_t ready_tx;
 
 	TaskHandle_t task_rx;
 	QueueHandle_t queue_rx;
+	SemaphoreHandle_t ready_rx;
 } task_uart_dta_t;
 
 typedef struct {

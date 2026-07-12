@@ -40,7 +40,7 @@
 /* Demo includes */
 #include "logger.h"
 #include "dwt.h"
-
+#include "semphr.h"
 /* Application & Tasks includes */
 #include "board.h"
 #include "app.h"
@@ -72,17 +72,17 @@ uint32_t g_task_xxxx_tx_runtime_us;
 
 uint32_t g_task_xxxx_rx_cnt;
 uint32_t g_task_xxxx_rx_runtime_us;
-
 /********************** external functions definition ************************/
 /* Task UART TX thread */
 void task_uart_tx(void *parameters) {
 	/* Prevent unused argument(s) compilation warning */
 	task_uart_dta_t *p_task_uart_tx_dta = (task_uart_dta_t*) parameters;
-	task_uart_tx_dta_t task_uart_tx_dta;
+	task_uart_tx_dta_t task_uart_tx_dta={0};
 
 	/*  Declare & Initialize Task Function variables */
 	g_task_xxxx_tx_cnt = G_TASK_XXXX_CNT_INI;
 	g_task_xxxx_tx_runtime_us = G_TASK_XXXX_RUNTIME_US_INI;
+
 
 	/* Print out: Task Initialized */
 	LOGGER_INFO(" ");
@@ -98,12 +98,12 @@ void task_uart_tx(void *parameters) {
 
 		g_task_xxxx_tx_runtime_us = cycle_counter_get_time_us();
 
-		if(pdPASS !=xQueueReceive(p_task_uart_dta->queue_tx, &task_uart_tx_dta , portMAX_DELAY)) continue;
-		HAL_UART_Transmit_IT(p_task_uart_tx_dta->device_id, task_uart_tx_dta.msg ,task_uart_tx_dta.msg_len);
-
-		/* Print out: Wait 250mS */
-				LOGGER_INFO(p_task_uart_tx_wait_250mS);
-		vTaskDelay(TASK_XXXX_DEL_MAX);
+		if(pdPASS !=xQueueReceive(p_task_uart_tx_dta->queue_tx, &task_uart_tx_dta , portMAX_DELAY)){
+			continue;
+		}
+		HAL_UART_Transmit_IT(p_task_uart_tx_dta->device_id, task_uart_tx_dta.msg, task_uart_tx_dta.msg_len);
+		xSemaphoreTake(p_task_uart_tx_dta->ready_tx, portMAX_DELAY);
+		vPortFree(task_uart_tx_dta.msg);
 	}
 }
 
@@ -121,9 +121,13 @@ void task_uart_rx(void *parameters) {
 	LOGGER_INFO("%s is running - Tick [mS] = %3d", pcTaskGetName(NULL),
 			(int )xTaskGetTickCount());
 
+
+	//uint8_t *msg = pvPortMalloc(128);
+
+	//HAL_StatusTypeDef ret = HAL_UART_Receive_IT(p_task_uart_rx_dta->device_id, msg, 128);
+
 	/* As per most tasks, this task is implemented in an infinite loop. */
 	for (;;) {
-		uint8_t test[200];
 		/* Update Task Counter */
 		g_task_xxxx_rx_cnt++;
 
@@ -131,10 +135,18 @@ void task_uart_rx(void *parameters) {
 
 		g_task_xxxx_rx_runtime_us = cycle_counter_get_time_us();
 
-		HAL_UART_Receive_IT(p_task_uart_rx_dta->device_id, test, sizeof(test));
+		//xSemaphoreTake(p_task_uart_rx_dta->ready_rx, portMAX_DELAY);
+
+
+		//xQueueSend(p_task_uart_rx_dta->queue_rx, &msg, portMAX_DELAY);
+
+		//msg = pvPortMalloc(128);
+		//HAL_UART_Receive_IT(p_task_uart_rx_dta->device_id, msg, sizeof(msg));
+
+
 
 		/* Print out: Wait 250mS */
-		LOGGER_INFO(p_task_uart_rx_wait_250mS);
+		//LOGGER_INFO(p_task_uart_rx_wait_250mS);
 		vTaskDelay(TASK_XXXX_DEL_MAX);
 	}
 }

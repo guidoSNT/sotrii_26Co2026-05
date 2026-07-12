@@ -73,11 +73,15 @@ void task_receiver(void *parameters)
 	LOGGER_INFO(" ");
 	LOGGER_INFO("  %s is running - Tick [mS] = %lu", pcTaskGetName(NULL), xTaskGetTickCount());
 
+	char * buffer[1024] = {'\0'};
 	/* As per most tasks, this task is implemented in an infinite loop. */
 	for (;;)
     {
 		/* Update Task Counter */
 		g_task_receiver_cnt++;
+
+		HAL_StatusTypeDef ret = HAL_UART_Receive(&huart2,(uint8_t *) buffer, 128, HAL_MAX_DELAY);
+		//read_uart(&huart2, (uint8_t *) buffer, sizeof(buffer));
 
     	/* Print out: Wait 250mS */
 		LOGGER_INFO(p_task_receiver_wait_250mS);

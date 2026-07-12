@@ -35,14 +35,16 @@
 /********************** inclusions *******************************************/
 /* Project includes */
 #include "main.h"
+#include "FreeRTOS.h"
 
 /* Demo includes */
 #include "logger.h"
 #include "dwt.h"
-
+#include "semphr.h"
 /* Application & Tasks includes */
 #include "board.h"
 #include "task_uart_attribute.h"
+#include <stdlib.h>
 
 /********************** macros and definitions *******************************/
 #define HAL_XXXX_CALLBACK_CNT_INI			0ul
@@ -96,15 +98,14 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 	// Check which version of the uart triggered this callback
 	if (huart->Instance == USART2) {
-		uint8_t *p_msg = NULL;
 		hal_xxxx_callback_flag = true;
 		hal_xxxx_callback_cnt++;
-		BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 		hal_xxxx_callback_runtime_us = cycle_counter_get_time_us();
+		BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-		if (pdPASS == xQueueReceiveFromISR(p_task_uart_dta->queue_tx, &p_msg, &xHigherPriorityTaskWoken)) {
-			free(p_msg);
-		}
+		xSemaphoreGiveFromISR(task_uart_dta.ready_tx, xHigherPriorityTaskWoken);
+
+		hal_xxxx_callback_runtime_us = cycle_counter_get_time_us();
 	}
 }
 
@@ -120,8 +121,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 		hal_xxxx_callback_flag = true;
 		hal_xxxx_callback_cnt++;
 
-		xQueueReceiveFromISR(p_task_uart_dta->queue_rx, pvBuffer,
-				pxHigherPriorityTaskWoken)
+		BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+		xSemaphoreGiveFromISR(task_uart_dta.ready_rx, xHigherPriorityTaskWoken);
 
 		hal_xxxx_callback_runtime_us = cycle_counter_get_time_us();
 	}
