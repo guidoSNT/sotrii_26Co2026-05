@@ -94,16 +94,17 @@ void task_uart_tx(void *parameters) {
 		/* Update Task Counter */
 		g_task_xxxx_tx_cnt++;
 
-		cycle_counter_reset();
-
-		g_task_xxxx_tx_runtime_us = cycle_counter_get_time_us();
-
 		if(pdPASS !=xQueueReceive(p_task_uart_tx_dta->queue_tx, &task_uart_tx_dta , portMAX_DELAY)){
 			continue;
 		}
+
+		cycle_counter_reset();
 		HAL_UART_Transmit_IT(p_task_uart_tx_dta->device_id, task_uart_tx_dta.msg, task_uart_tx_dta.msg_len);
+		g_task_xxxx_tx_runtime_us = cycle_counter_get_time_us();
+
 		xSemaphoreTake(p_task_uart_tx_dta->ready_tx, portMAX_DELAY);
 		vPortFree(task_uart_tx_dta.msg);
+
 	}
 }
 
@@ -122,31 +123,26 @@ void task_uart_rx(void *parameters) {
 			(int )xTaskGetTickCount());
 
 
-	//uint8_t *msg = pvPortMalloc(128);
-
-	//HAL_StatusTypeDef ret = HAL_UART_Receive_IT(p_task_uart_rx_dta->device_id, msg, 128);
+	uint8_t *msg = pvPortMalloc(SPOOL_LEN);
+	HAL_UART_Receive_IT(p_task_uart_rx_dta->device_id, msg, 128);
 
 	/* As per most tasks, this task is implemented in an infinite loop. */
 	for (;;) {
 		/* Update Task Counter */
 		g_task_xxxx_rx_cnt++;
 
+		xSemaphoreTake(p_task_uart_rx_dta->ready_rx, portMAX_DELAY);
+		xQueueSend(p_task_uart_rx_dta->queue_rx, &msg, portMAX_DELAY);
+
+		msg = pvPortMalloc(SPOOL_LEN);
+
 		cycle_counter_reset();
-
+		HAL_UART_Receive_IT(p_task_uart_rx_dta->device_id, msg, sizeof(msg));
 		g_task_xxxx_rx_runtime_us = cycle_counter_get_time_us();
-
-		//xSemaphoreTake(p_task_uart_rx_dta->ready_rx, portMAX_DELAY);
-
-
-		//xQueueSend(p_task_uart_rx_dta->queue_rx, &msg, portMAX_DELAY);
-
-		//msg = pvPortMalloc(128);
-		//HAL_UART_Receive_IT(p_task_uart_rx_dta->device_id, msg, sizeof(msg));
-
 
 
 		/* Print out: Wait 250mS */
-		//LOGGER_INFO(p_task_uart_rx_wait_250mS);
+		LOGGER_INFO(p_task_uart_rx_wait_250mS);
 		vTaskDelay(TASK_XXXX_DEL_MAX);
 	}
 }

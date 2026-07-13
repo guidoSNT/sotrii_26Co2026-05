@@ -102,12 +102,11 @@ void task_adc_rx(void *parameters)
 
 		cycle_counter_reset();
     	HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_rx_buff, ADC_RX_BUFF_LENGTH);
+		g_task_xxxx_rx_runtime_us = cycle_counter_get_time_us();
 
     	xSemaphoreTake(task_adc_dta.dma_adc_semph, portMAX_DELAY);
 		HAL_ADC_Stop_DMA(&hadc1);
 		xSemaphoreGive(task_adc_dta.dma_adc_semph);
-
-		g_task_xxxx_rx_runtime_us = cycle_counter_get_time_us();
 
     	/* Print out: Wait 250mS */
 		LOGGER_INFO(p_task_adc_rx_wait_250mS);

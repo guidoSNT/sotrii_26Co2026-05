@@ -125,14 +125,14 @@ void write_uart(UART_HandleTypeDef *h_uart_device, uint8_t *msg, size_t msg_len)
 }
 
 void read_uart(UART_HandleTypeDef *h_uart_device, uint8_t *msg, size_t msg_len) {
-	if(msg ==NULL || msg_len<SPOOL_LEN) return;
+	if(msg ==NULL || msg_len<128) return;
 	task_uart_dta.device_id = h_uart_device;
 
 	// Check which version of the uart triggered this function
 	if (task_uart_dta.device_id == h_uart_device) {
 		uint8_t * p_mem;
 		if(pdPASS == xQueueReceive(task_uart_dta.queue_rx, &p_mem, portMAX_DELAY)){
-			memcpy(msg, p_mem, SPOOL_LEN);
+			memcpy(msg, p_mem, 128);
 			vPortFree(p_mem);
 		}
 	}

@@ -100,7 +100,7 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 	if (huart->Instance == USART2) {
 		hal_xxxx_callback_flag = true;
 		hal_xxxx_callback_cnt++;
-		hal_xxxx_callback_runtime_us = cycle_counter_get_time_us();
+
 		BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
 		xSemaphoreGiveFromISR(task_uart_dta.ready_tx, xHigherPriorityTaskWoken);

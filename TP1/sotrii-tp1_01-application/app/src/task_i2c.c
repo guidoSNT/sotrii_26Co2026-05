@@ -83,12 +83,6 @@ void task_i2c_tx(void *parameters)
 
 	task_i2c_dta_t *p_task_i2c_tx_dta = (task_i2c_dta_t *)parameters;
 
-	/* Serial LCD I2C Module–PCF8574
-	 * https://alselectro.wordpress.com/2016/05/12/serial-lcd-i2c-module-pcf8574/
-	 * https://www.ti.com/product/PCF8574
- 	 * i2c1_tx_address_rd_wr = ((address base | jumper less address) << 1) | /write
- 	 */
-
 	/* Print out: Task Initialized */
 	LOGGER_INFO(" ");
 	LOGGER_INFO("%s is running - Tick [mS] = %3d", pcTaskGetName(NULL), (int)xTaskGetTickCount());
@@ -100,9 +94,6 @@ void task_i2c_tx(void *parameters)
 		g_task_xxxx_tx_cnt++;
 
 		task_i2c_tx_dta_t task_i2c_tx_dta;
-
-
-
 		xQueueReceive(p_task_i2c_tx_dta->queue_tx, &task_i2c_tx_dta, portMAX_DELAY);
 
 		cycle_counter_reset();

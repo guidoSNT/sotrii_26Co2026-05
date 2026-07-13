@@ -55,7 +55,7 @@
 /********************** internal data declaration ****************************/
 
 /********************** internal functions declaration ***********************/
-
+static char buffer[SPOOL_LEN] = {'\0'};
 /********************** internal data definition *****************************/
 const char *p_task_receiver_wait_250mS		= "   ==> Task RECEIVER - Wait:   250mS";
 
@@ -73,15 +73,16 @@ void task_receiver(void *parameters)
 	LOGGER_INFO(" ");
 	LOGGER_INFO("  %s is running - Tick [mS] = %lu", pcTaskGetName(NULL), xTaskGetTickCount());
 
-	char * buffer[1024] = {'\0'};
+
 	/* As per most tasks, this task is implemented in an infinite loop. */
 	for (;;)
     {
 		/* Update Task Counter */
 		g_task_receiver_cnt++;
+		read_uart(&huart2, (uint8_t *) buffer, sizeof(buffer));
 
-		HAL_StatusTypeDef ret = HAL_UART_Receive(&huart2,(uint8_t *) buffer, 128, HAL_MAX_DELAY);
-		//read_uart(&huart2, (uint8_t *) buffer, sizeof(buffer));
+		buffer[SPOOL_LEN-1] = '\0';
+		LOGGER_INFO("%s", buffer);
 
     	/* Print out: Wait 250mS */
 		LOGGER_INFO(p_task_receiver_wait_250mS);
