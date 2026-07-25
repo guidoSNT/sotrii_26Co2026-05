@@ -67,6 +67,9 @@ btn_t btn[BTN_QTY] = {{BTN_A, BTN_A_PORT, BTN_A_PIN, BTN_A_HOVER},
 btn_sc_t btn_sc[BTN_QTY] = {{ST_BTN_UP, EV_BTN_UP, ZERO, EV_BTN_UP, ZERO},
 							{ST_BTN_UP, EV_BTN_UP, ZERO, EV_BTN_UP, ZERO}};
 
+btn_ao_t btn_ao[BTN_QTY] = {{NULL,"Queue BTN_A AO", NULL, "Task BTN_A AO"},
+						  	  {NULL,"Queue BTN_B AO", NULL, "Task BTN_B AO"}};
+
 /********************** internal functions declaration ***********************/
 void task_btn_statechart(h_btn_t *h_btn_);
 
@@ -75,9 +78,8 @@ void task_btn_statechart(h_btn_t *h_btn_);
 /********************** external data declaration ****************************/
 uint32_t g_task_btn_cnt;
 
-h_btn_t	h_btn[BTN_QTY] = {{&btn[BTN_A], &btn_sc[BTN_A]},
-						  {&btn[BTN_B], &btn_sc[BTN_B]}};
-
+h_btn_t h_btn[BTN_QTY] = {{&btn[BTN_A], &btn_sc[BTN_A], &btn_ao[BTN_A]},
+				   		  {&btn[BTN_B], &btn_sc[BTN_B], &btn_ao[BTN_B]}};
 /********************** external functions definition ************************/
 /* Task thread */
 void task_btn(void *parameters)
@@ -97,8 +99,10 @@ void task_btn(void *parameters)
 		g_task_btn_cnt++;
 
 		/* Get Events to excite Statechart */
+		GPIO_PinState test = HAL_GPIO_ReadPin(p_h_btn->btn->gpio_port, p_h_btn->btn->pin);
 		p_h_btn->btn->pin_state = HAL_GPIO_ReadPin(p_h_btn->btn->gpio_port, p_h_btn->btn->pin);
-		if (BTN_PRESSED == p_h_btn->btn->pin_state)
+
+		if (p_h_btn->btn->pin_state == BTN_PRESSED)
 		{
 			p_h_btn->btn_sc->ev_in = EV_BTN_DOWN;
 		}
