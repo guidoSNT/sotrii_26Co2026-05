@@ -72,7 +72,7 @@ void open_btn_ao(h_btn_t *h_btn_)
     ret = xTaskCreate(task_btn,
     				  h_btn_->btn_ao->task_txt,
 					  (configMINIMAL_STACK_SIZE),
-					  (void *)&h_btn_,
+					  (void *)h_btn_,
 					  (tskIDLE_PRIORITY + 1ul),
 					  &h_btn_->btn_ao->h_task);
 
@@ -87,8 +87,8 @@ void release_btn_ao(h_btn_t *h_btn_)
 	vTaskDelete(h_btn_->btn_ao->h_task);
 }
 
-BaseType_t read_btn_ao(h_btn_t *h_btn_, btn_ev_t * event_){
-	return xQueueReceive(h_btn_->btn_ao->h_queue, (void *)event_, (TickType_t)ZERO);
+BaseType_t send_btn_ao(h_btn_t *h_btn_, void *event_){
+	return xQueueSend((QueueHandle_t)h_btn_->btn_ao->h_queue, event_, (TickType_t)ZERO);
 }
 
 void ioctl_btn_ao(h_btn_t *h_btn_)

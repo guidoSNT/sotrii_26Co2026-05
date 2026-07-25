@@ -65,7 +65,6 @@
 #define G_APP_STACK_OVERFLOW_CNT_INI	0ul
 
 
-
 /********************** internal data declaration ****************************/
 
 /********************** internal functions declaration ***********************/
@@ -80,9 +79,6 @@ uint32_t volatile g_app_tick_cnt;
 uint32_t g_task_idle_cnt;
 uint32_t g_app_stack_overflow_cnt;
 
-/* Declare a variable of type QueueHandle_t. This is used to reference queues*/
-QueueHandle_t h_sys_task_q;
-
 /* Declare a variable of type SemaphoreHandle_t (binary or counting) or mutex.
  * This is used to reference the semaphore that is used to synchronize a thread
  * with other thread or to ensure mutual exclusive access to...*/
@@ -91,7 +87,6 @@ QueueHandle_t h_sys_task_q;
 TaskHandle_t h_task_a;
 TaskHandle_t h_task_b;
 TaskHandle_t h_task_btn;
-TaskHandle_t h_task_sys;
 
 /********************** external functions definition ************************/
 void app_init(void)
@@ -138,18 +133,6 @@ void app_init(void)
     /* Check the thread was created successfully. */
     configASSERT(pdPASS == ret);
 
-    /* Task System thread at priority 1 */
-    ret = xTaskCreate(task_sys,							/* Pointer to the function thats implement the task. */
-					  "Task Sys     ",					/* Text name for the task. This is to facilitate debugging only. */
-					  (configMINIMAL_STACK_SIZE),		/* Stack depth in words. */
-					  (void *)&h_sys,					/* We are using the task parameter. */
-					  (tskIDLE_PRIORITY + 1ul),			/* This task will run at priority 1. */
-					  &h_task_sys);						/* We are using a variable as task handle. */
-
-    /* Check the thread was created successfully. */
-    configASSERT(pdPASS == ret);
-
-
 
     /* Total amount of heap space that remains unallocated. Is also available
      * with xFreeBytesRemaining variable for heap management schemes 2 to 5.
@@ -163,6 +146,7 @@ void app_init(void)
 
     /* Active Objects Open */
     open_btn_ao(&h_btn[BTN_A]);
+    open_sys_ao(&h_sys);
     open_led_ao(&h_led[LED_A]);
 
     /* Application Interrupts Init */

@@ -61,8 +61,6 @@ typedef enum btn_ev {EV_BTN_UP,
 typedef enum btn_st {ST_BTN_UP,
 					 ST_BTN_DOWN} btn_st_t;
 
-
-
 /********************** typedef **********************************************/
 /* Structure of Button */
 typedef struct
@@ -99,7 +97,6 @@ typedef struct
 	btn_sc_t *		btn_sc;
 	btn_ao_t * 		btn_ao;
 } h_btn_t;
-
 /********************** external data declaration ****************************/
 
 /********************** external functions declaration ***********************/

@@ -104,8 +104,7 @@ void release_led_ao(h_led_t *h_led_)
 	vTaskDelete(h_led_->led_ao->h_task);
 }
 
-BaseType_t send_led_ao(h_led_t *h_led_, void *event_)
-{
+BaseType_t send_led_ao(h_led_t *h_led_, void *event_){
 	return xQueueSend((QueueHandle_t)h_led_->led_ao->h_queue, event_, (TickType_t)ZERO);
 }
 
