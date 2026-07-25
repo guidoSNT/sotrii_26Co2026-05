@@ -50,7 +50,7 @@
 
 /********************** macros and definitions *******************************/
 #define QUEUE_LENGTH__		(1)
-#define QUEUE_ITEM_SIZE__	(sizeof(led_ev_t))
+#define QUEUE_ITEM_SIZE__	(sizeof(led_dta_t))
 
 /********************** internal data declaration ****************************/
 
@@ -104,8 +104,10 @@ void release_led_ao(h_led_t *h_led_)
 	vTaskDelete(h_led_->led_ao->h_task);
 }
 
-BaseType_t send_led_ao(h_led_t *h_led_, void *event_){
-	return xQueueSend((QueueHandle_t)h_led_->led_ao->h_queue, event_, (TickType_t)ZERO);
+BaseType_t send_led_ao(h_led_t *h_led_, led_ev_t led_ev, TickType_t tick_out){
+	led_dta_t led_dta = {led_ev, tick_out};
+
+	return xQueueSend((QueueHandle_t)h_led_->led_ao->h_queue, &led_dta, (TickType_t)ZERO);
 }
 
 void ioctl_led_ao(h_led_t *h_led_)

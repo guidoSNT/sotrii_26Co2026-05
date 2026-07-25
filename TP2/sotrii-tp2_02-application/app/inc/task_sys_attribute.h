@@ -79,11 +79,18 @@ typedef struct {
 	char			task_txt[TASK_TXT_LEN];
 } sys_ao_t;
 
+/* Structure of data */
+typedef struct {
+	sys_ev_t sys_ev;
+	TickType_t tick;
+} sys_dta_t;
+
 /* Structure of Task */
 typedef struct
 {
 	sys_sc_t *	sys_sc;
 	sys_ao_t * sys_ao;
+	sys_dta_t * sys_dta;
 } h_sys_t;
 
 /********************** external data declaration ****************************/

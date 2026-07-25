@@ -132,7 +132,7 @@ void task_btn_statechart(h_btn_t *h_btn_)
 				h_btn_->btn_sc->tick_out = h_btn_->btn_sc->tick;
 				h_btn_->btn_sc->tick = ZERO;
 
-				send_sys_ao(&h_sys, (void *)&h_btn->btn_sc->ev_out);
+				send_sys_ao(&h_sys, (sys_ev_t) h_btn_->btn_sc->ev_out, h_btn_->btn_sc->tick_out);
 			}
 			else
 			{
@@ -150,7 +150,7 @@ void task_btn_statechart(h_btn_t *h_btn_)
 				h_btn_->btn_sc->tick_out = h_btn_->btn_sc->tick;
 				h_btn_->btn_sc->tick = ZERO;
 
-				send_sys_ao(&h_sys, (void *)&h_btn->btn_sc->ev_out);
+				send_sys_ao(&h_sys, (sys_ev_t) h_btn_->btn_sc->ev_out, h_btn_->btn_sc->tick_out);
 			}
 			else
 			{

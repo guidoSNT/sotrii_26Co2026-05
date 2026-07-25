@@ -103,10 +103,11 @@ void release_sys_ao(h_sys_t *h_sys_)
 	vTaskDelete(h_sys_->sys_ao->h_task);
 }
 
-BaseType_t send_sys_ao(h_sys_t *h_sys_, void *event_){
-	return xQueueSend((QueueHandle_t)h_sys_->sys_ao->h_queue, event_, (TickType_t)ZERO);
-}
+BaseType_t send_sys_ao(h_sys_t *h_sys_, sys_ev_t event_, TickType_t tick_out){
+	sys_dta_t sys_dta = {event_, tick_out};
 
+	return xQueueSend((QueueHandle_t)h_sys_->sys_ao->h_queue, &sys_dta, (TickType_t)ZERO);
+}
 
 void ioctl_sys_ao(h_sys_t *h_sys_) {
 

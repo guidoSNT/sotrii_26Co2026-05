@@ -52,7 +52,7 @@ extern "C" {
 /********************** external functions declaration ***********************/
 extern void open_led_ao(h_led_t *h_led_);
 extern void release_led_ao(h_led_t *h_led_);
-extern BaseType_t send_led_ao(h_led_t *h_led_, void *event_);
+extern BaseType_t send_led_ao(h_led_t *h_led_, led_ev_t led_ev, TickType_t tick_out);
 extern void ioctl_led_ao(h_led_t *h_led_);
 
 /********************** End of CPP guard *************************************/

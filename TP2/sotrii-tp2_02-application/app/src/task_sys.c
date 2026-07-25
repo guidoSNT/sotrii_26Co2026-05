@@ -66,6 +66,7 @@ sys_sc_t sys_sc = {ST_SYS_IDLE, EV_SYS_OFF, ZERO, EV_SYS_NONE, ZERO};
 
 sys_ao_t sys_ao = {NULL,"Queue SYS_A AO", NULL, "Task SYS_A AO"};
 
+sys_dta_t sys_dta = {EV_SYS_NONE, ZERO};
 /********************** internal functions declaration ***********************/
 void task_sys_statechart(h_sys_t *h_sys_);
 
@@ -74,7 +75,7 @@ void task_sys_statechart(h_sys_t *h_sys_);
 /********************** external data declaration ****************************/
 uint32_t g_task_sys_cnt;
 
-h_sys_t h_sys = {&sys_sc, &sys_ao};
+h_sys_t h_sys = {&sys_sc, &sys_ao, &sys_dta};
 
 /********************** external functions definition ************************/
 /* Task thread */
@@ -83,6 +84,7 @@ void task_sys(void *parameters)
 	/*  Declare & Initialize Task Function variables */
 	g_task_sys_cnt = G_TASK_SYS_CNT_INI;
 	h_sys_t *p_h_sys = (h_sys_t *)parameters;
+	BaseType_t ret;
 
 	/* Print out: Task Initialized */
 	LOGGER_INFO(" ");
@@ -95,10 +97,16 @@ void task_sys(void *parameters)
 		g_task_sys_cnt++;
 
 		/* Get Events to excite Statechart */
-		if (pdFAIL == xQueueReceive(p_h_sys->sys_ao->h_queue, (void *)&p_h_sys->sys_sc->ev_in, (TickType_t)ZERO))
-		{
+		ret = xQueueReceive(p_h_sys->sys_ao->h_queue, (void *)p_h_sys->sys_dta, (TickType_t)ZERO);
+
+		if(pdFAIL == ret){
 			p_h_sys->sys_sc->ev_in = EV_SYS_NONE;
+			p_h_sys->sys_sc->tick_out = 0;
+		} else {
+			p_h_sys->sys_sc->ev_in = p_h_sys->sys_dta->sys_ev;
+			p_h_sys->sys_sc->tick_out = p_h_sys->sys_dta->tick;
 		}
+
 
 		/* Run Statechart */
     	task_sys_statechart(p_h_sys);

@@ -71,6 +71,10 @@ led_ao_t led_ao[LED_QTY] = {{NULL, "Queue LED_A AO", NULL, "Task LED_A AO"},
 					 		{NULL, "Queue LED_B AO", NULL, "Task LED_B AO"},
 					 		{NULL, "Queue LED_C AO", NULL, "Task LED_C AO"}};
 
+led_dta_t led_dta[LED_QTY] = {{EV_LED_NONE, ZERO},
+							  {EV_LED_NONE, ZERO},
+							  {EV_LED_NONE, ZERO}};
+
 /********************** internal functions declaration ***********************/
 void task_led_statechart(h_led_t *h_led_);
 
@@ -79,9 +83,9 @@ void task_led_statechart(h_led_t *h_led_);
 /********************** external data declaration ****************************/
 uint32_t g_task_led_cnt;
 
-h_led_t h_led[LED_QTY] = {{&led[LED_A], &led_sc[LED_A], &led_ao[LED_A]},
-				   		  {&led[LED_B], &led_sc[LED_B], &led_ao[LED_B]},
-				   		  {&led[LED_C], &led_sc[LED_C], &led_ao[LED_C]}};
+h_led_t h_led[LED_QTY] = {{&led[LED_A], &led_sc[LED_A], &led_ao[LED_A], &led_dta[LED_A]},
+				   		  {&led[LED_B], &led_sc[LED_B], &led_ao[LED_B], &led_dta[LED_B]},
+				   		  {&led[LED_C], &led_sc[LED_C], &led_ao[LED_C], &led_dta[LED_C]}};
 
 /********************** external functions definition ************************/
 /* Task thread */
@@ -102,9 +106,12 @@ void task_led(void *parameters)
 		g_task_led_cnt++;
 
 		/* Get Events to excite Statechart */
-		if (pdFAIL == xQueueReceive(p_h_led->led_ao->h_queue, (void *)&p_h_led->led_sc->ev_in, (TickType_t)ZERO))
-		{
+		if (pdFAIL == xQueueReceive(p_h_led->led_ao->h_queue, (void *)p_h_led->led_dta, (TickType_t)ZERO)) {
 			p_h_led->led_sc->ev_in = EV_LED_NONE;
+			p_h_led->led_sc->tick_out = ZERO;
+		} else {
+			p_h_led->led_sc->ev_in = p_h_led->led_dta->led_ev;
+			p_h_led->led_sc->tick_out = p_h_led->led_dta->tick;
 		}
 
 		/* Run Statechart */
