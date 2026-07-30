@@ -77,4 +77,6 @@ open_led_ao(&h_led[LED_B]);
 open_led_ao(&h_led[LED_C]);
 ```
 
-![Video](https://drive.google.com/file/d/1LKmrjj-nXqPLtrk5qGtEmjKyYM5chEDS/view?usp=sharing)
+Video:
+
+https://drive.google.com/file/d/1LKmrjj-nXqPLtrk5qGtEmjKyYM5chEDS/view?usp=sharing
