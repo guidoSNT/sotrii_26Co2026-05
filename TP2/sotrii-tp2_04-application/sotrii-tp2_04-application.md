@@ -77,4 +77,4 @@ open_led_ao(&h_led[LED_B]);
 open_led_ao(&h_led[LED_C]);
 ```
 
-[![Watch the video](https://raw.githubusercontent.com/guidoSNT/sotrii_26Co2026-05/tp2/videos/thumbnail.jpg)](https://raw.githubusercontent.com/guidoSNT/sotrii_26Co2026-05/tp2/videos/act4_tp2_rtos2.mp4)
+![Video](https://drive.google.com/file/d/1LKmrjj-nXqPLtrk5qGtEmjKyYM5chEDS/view?usp=sharing)
