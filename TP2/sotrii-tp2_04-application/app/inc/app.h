@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2026 Juan Manuel Cruz <jcruz@fi.uba.ar> <jcruz@frba.utn.edu.ar>.
+ * Copyright (c) 2026 Sebastian Bedin <sebabedin@gmail.com> &
+ * 					  Juan Manuel Cruz <jcruz@fi.uba.ar> <jcruz@frba.utn.edu.ar>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,69 +30,51 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @author : Juan Manuel Cruz <jcruz@fi.uba.ar> <jcruz@frba.utn.edu.ar>
+ * @author : Sebastian Bedin <sebabedin@gmail.com> &
+ * 			 Juan Manuel Cruz <jcruz@fi.uba.ar> <jcruz@frba.utn.edu.ar>
  */
 
+#ifndef APP_H_
+#define APP_H_
+
+/********************** CPP guard ********************************************/
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /********************** inclusions *******************************************/
-/* Project includes */
-#include "main.h"
-#include "cmsis_os.h"
 
-/* Demo includes */
-#include "logger.h"
-#include "dwt.h"
+/********************** macros ***********************************************/
+#define TASK_QTY 2ul
 
-/* Application & Tasks includes */
-#include "board.h"
-#include "app.h"
-#include "app_it.h"
-#include "task_btn.h"
-#include "task_btn_attribute.h"
-
-/********************** macros and definitions *******************************/
-#define QUEUE_LENGTH_       (5)
-#define QUEUE_ITEM_SIZE_    (sizeof(btn_ev_t))
-
-/********************** internal data declaration ****************************/
-
-/********************** internal functions declaration ***********************/
-
-/********************** internal data definition *****************************/
+/********************** typedef **********************************************/
 
 /********************** external data declaration ****************************/
+extern volatile uint32_t g_app_tick_cnt;
+extern uint32_t g_task_idle_cnt;
+extern uint32_t g_app_stack_overflow_cnt;
 
-/********************** external functions definition ************************/
-/* Interface functions */
-void open_btn_ao(h_btn_t *h_btn_)
-{
-	BaseType_t ret = xTaskCreate(task_btn,
-    				 h_btn_->btn_ao->task_txt,
-					 (configMINIMAL_STACK_SIZE),
-					 (void *)h_btn_,
-					 (tskIDLE_PRIORITY + 1ul),
-					 &h_btn_->btn_ao->h_task);
+/* Declare a variable of type QueueHandle_t. This is used to reference queues*/
+extern QueueHandle_t h_sys_task_q;
 
-    configASSERT(pdPASS == ret);
+/* Declare a variable of type SemaphoreHandle_t (binary or counting) or mutex.
+ * This is used to reference the semaphore that is used to synchronize a thread
+ * with other thread or to ensure mutual exclusive access to...*/
+
+/* Declare a variable of type TaskHandle_t. This is used to reference threads. */
+extern TaskHandle_t h_task_a;
+extern TaskHandle_t h_task_b;
+extern TaskHandle_t h_task_btn;
+extern TaskHandle_t h_task_sys;
+
+/********************** external functions declaration ***********************/
+extern void app_init(void);
+
+/********************** End of CPP guard *************************************/
+#ifdef __cplusplus
 }
+#endif
 
-void release_btn_ao(h_btn_t *h_btn_)
-{
-    vQueueUnregisterQueue(h_btn_->btn_ao->h_queue);
-	vQueueDelete(h_btn_->btn_ao->h_queue);
-
-	vTaskDelete(h_btn_->btn_ao->h_task);
-}
-
-BaseType_t send_btn_ao(h_btn_t *h_btn_, void *event_){
-	UNUSED(h_btn_);
-	UNUSED(event_);
-	return pdPASS;
-}
-
-void ioctl_btn_ao(h_btn_t *h_btn_)
-{
-	/* Prevent unused argument(s) compilation warning */
-	UNUSED(h_btn_);
-}
+#endif /* APP_H_ */
 
 /********************** end of file ******************************************/

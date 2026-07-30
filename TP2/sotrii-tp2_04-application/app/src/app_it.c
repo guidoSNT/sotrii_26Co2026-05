@@ -35,7 +35,6 @@
 /********************** inclusions *******************************************/
 /* Project includes */
 #include "main.h"
-#include "cmsis_os.h"
 
 /* Demo includes */
 #include "logger.h"
@@ -43,14 +42,8 @@
 
 /* Application & Tasks includes */
 #include "board.h"
-#include "app.h"
-#include "app_it.h"
-#include "task_btn.h"
-#include "task_btn_attribute.h"
 
 /********************** macros and definitions *******************************/
-#define QUEUE_LENGTH_       (5)
-#define QUEUE_ITEM_SIZE_    (sizeof(btn_ev_t))
 
 /********************** internal data declaration ****************************/
 
@@ -61,37 +54,28 @@
 /********************** external data declaration ****************************/
 
 /********************** external functions definition ************************/
-/* Interface functions */
-void open_btn_ao(h_btn_t *h_btn_)
+void app_it_init(void)
 {
-	BaseType_t ret = xTaskCreate(task_btn,
-    				 h_btn_->btn_ao->task_txt,
-					 (configMINIMAL_STACK_SIZE),
-					 (void *)h_btn_,
-					 (tskIDLE_PRIORITY + 1ul),
-					 &h_btn_->btn_ao->h_task);
+	/* Init to be done */
 
-    configASSERT(pdPASS == ret);
+	/* Protect shared resource */
+	__asm("CPSID i");	/* disable interrupts */
+
+	__asm("CPSIE i");	/* enable interrupts */
 }
 
-void release_btn_ao(h_btn_t *h_btn_)
+/**
+  * @brief  EXTI line detection callbacks.
+  * @param  GPIO_Pin Specifies the pins connected EXTI line
+  * @retval None
+  */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    vQueueUnregisterQueue(h_btn_->btn_ao->h_queue);
-	vQueueDelete(h_btn_->btn_ao->h_queue);
-
-	vTaskDelete(h_btn_->btn_ao->h_task);
-}
-
-BaseType_t send_btn_ao(h_btn_t *h_btn_, void *event_){
-	UNUSED(h_btn_);
-	UNUSED(event_);
-	return pdPASS;
-}
-
-void ioctl_btn_ao(h_btn_t *h_btn_)
-{
-	/* Prevent unused argument(s) compilation warning */
-	UNUSED(h_btn_);
+	// Check which version of the gpio triggered this callback
+	if (GPIO_Pin == BTN_A_PIN)
+	{
+		/* Work to be done. */
+	}
 }
 
 /********************** end of file ******************************************/

@@ -44,13 +44,14 @@
 /* Application & Tasks includes */
 #include "board.h"
 #include "app.h"
-#include "app_it.h"
-#include "task_btn.h"
-#include "task_btn_attribute.h"
 
 /********************** macros and definitions *******************************/
-#define QUEUE_LENGTH_       (5)
-#define QUEUE_ITEM_SIZE_    (sizeof(btn_ev_t))
+#define G_TASK_A_CNT_INI	0ul
+
+#define DEL_A_MIN			(pdMS_TO_TICKS(250ul))
+
+#define TASK_A_DEL_ZERO		(pdMS_TO_TICKS(0ul))
+#define TASK_A_DEL_MAX		DEL_A_MIN
 
 /********************** internal data declaration ****************************/
 
@@ -59,39 +60,28 @@
 /********************** internal data definition *****************************/
 
 /********************** external data declaration ****************************/
+uint32_t g_task_a_cnt;
 
 /********************** external functions definition ************************/
-/* Interface functions */
-void open_btn_ao(h_btn_t *h_btn_)
+/* Task thread */
+void task_a(void *parameters)
 {
-	BaseType_t ret = xTaskCreate(task_btn,
-    				 h_btn_->btn_ao->task_txt,
-					 (configMINIMAL_STACK_SIZE),
-					 (void *)h_btn_,
-					 (tskIDLE_PRIORITY + 1ul),
-					 &h_btn_->btn_ao->h_task);
+	/*  Declare & Initialize Task Function variables */
+	g_task_a_cnt = G_TASK_A_CNT_INI;
 
-    configASSERT(pdPASS == ret);
-}
+	/* Print out: Task Initialized */
+	LOGGER_INFO(" ");
+	LOGGER_INFO("  %s is running - Tick [mS] = %lu", pcTaskGetName(NULL), xTaskGetTickCount());
 
-void release_btn_ao(h_btn_t *h_btn_)
-{
-    vQueueUnregisterQueue(h_btn_->btn_ao->h_queue);
-	vQueueDelete(h_btn_->btn_ao->h_queue);
+	/* As per most tasks, this task is implemented in an infinite loop. */
+	for (;;)
+	{
+		/* Update Task Counter */
+		g_task_a_cnt++;
 
-	vTaskDelete(h_btn_->btn_ao->h_task);
-}
-
-BaseType_t send_btn_ao(h_btn_t *h_btn_, void *event_){
-	UNUSED(h_btn_);
-	UNUSED(event_);
-	return pdPASS;
-}
-
-void ioctl_btn_ao(h_btn_t *h_btn_)
-{
-	/* Prevent unused argument(s) compilation warning */
-	UNUSED(h_btn_);
+    	/* We want this task to execute every 50 milliseconds. */
+		vTaskDelay(DEL_A_MIN);
+	}
 }
 
 /********************** end of file ******************************************/

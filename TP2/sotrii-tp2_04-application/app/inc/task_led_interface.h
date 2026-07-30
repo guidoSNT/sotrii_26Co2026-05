@@ -32,66 +32,34 @@
  * @author : Juan Manuel Cruz <jcruz@fi.uba.ar> <jcruz@frba.utn.edu.ar>
  */
 
+#ifndef TASK_LED_INTERFACE_H_
+#define TASK_LED_INTERFACE_H_
+
+/********************** CPP guard ********************************************/
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /********************** inclusions *******************************************/
-/* Project includes */
-#include "main.h"
-#include "cmsis_os.h"
+#include "task_led_attribute.h"
 
-/* Demo includes */
-#include "logger.h"
-#include "dwt.h"
+/********************** macros ***********************************************/
 
-/* Application & Tasks includes */
-#include "board.h"
-#include "app.h"
-#include "app_it.h"
-#include "task_btn.h"
-#include "task_btn_attribute.h"
-
-/********************** macros and definitions *******************************/
-#define QUEUE_LENGTH_       (5)
-#define QUEUE_ITEM_SIZE_    (sizeof(btn_ev_t))
-
-/********************** internal data declaration ****************************/
-
-/********************** internal functions declaration ***********************/
-
-/********************** internal data definition *****************************/
+/********************** typedef **********************************************/
 
 /********************** external data declaration ****************************/
 
-/********************** external functions definition ************************/
-/* Interface functions */
-void open_btn_ao(h_btn_t *h_btn_)
-{
-	BaseType_t ret = xTaskCreate(task_btn,
-    				 h_btn_->btn_ao->task_txt,
-					 (configMINIMAL_STACK_SIZE),
-					 (void *)h_btn_,
-					 (tskIDLE_PRIORITY + 1ul),
-					 &h_btn_->btn_ao->h_task);
+/********************** external functions declaration ***********************/
+extern void open_led_ao(h_led_t *h_led_);
+extern void release_led_ao(h_led_t *h_led_);
+extern BaseType_t send_led_ao(h_led_t *h_led_, led_ev_t led_ev, TickType_t tick_out);
+extern void ioctl_led_ao(h_led_t *h_led_);
 
-    configASSERT(pdPASS == ret);
+/********************** End of CPP guard *************************************/
+#ifdef __cplusplus
 }
+#endif
 
-void release_btn_ao(h_btn_t *h_btn_)
-{
-    vQueueUnregisterQueue(h_btn_->btn_ao->h_queue);
-	vQueueDelete(h_btn_->btn_ao->h_queue);
-
-	vTaskDelete(h_btn_->btn_ao->h_task);
-}
-
-BaseType_t send_btn_ao(h_btn_t *h_btn_, void *event_){
-	UNUSED(h_btn_);
-	UNUSED(event_);
-	return pdPASS;
-}
-
-void ioctl_btn_ao(h_btn_t *h_btn_)
-{
-	/* Prevent unused argument(s) compilation warning */
-	UNUSED(h_btn_);
-}
+#endif /* TASK_LED_INTERFACE_H_ */
 
 /********************** end of file ******************************************/

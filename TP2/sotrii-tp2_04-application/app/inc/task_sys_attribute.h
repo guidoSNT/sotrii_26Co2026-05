@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2026 Juan Manuel Cruz <jcruz@fi.uba.ar> <jcruz@frba.utn.edu.ar>.
+ * Copyright (c) 2026 Sebastian Bedin <sebabedin@gmail.com> &
+ * 					  Juan Manuel Cruz <jcruz@fi.uba.ar> <jcruz@frba.utn.edu.ar>.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,69 +30,83 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @author : Juan Manuel Cruz <jcruz@fi.uba.ar> <jcruz@frba.utn.edu.ar>
+ * @author : Sebastian Bedin <sebabedin@gmail.com> &
+ * 			 Juan Manuel Cruz <jcruz@fi.uba.ar> <jcruz@frba.utn.edu.ar>
  */
 
+#ifndef TASK_SYS_ATTRIBUTE_H_
+#define TASK_SYS_ATTRIBUTE_H_
+
+/********************** CPP guard ********************************************/
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /********************** inclusions *******************************************/
-/* Project includes */
-#include "main.h"
-#include "cmsis_os.h"
-
-/* Demo includes */
-#include "logger.h"
-#include "dwt.h"
-
-/* Application & Tasks includes */
-#include "board.h"
-#include "app.h"
-#include "app_it.h"
-#include "task_btn.h"
 #include "task_btn_attribute.h"
 
-/********************** macros and definitions *******************************/
-#define QUEUE_LENGTH_       (5)
-#define QUEUE_ITEM_SIZE_    (sizeof(btn_ev_t))
+/********************** macros ***********************************************/
+#define QUEUE_TXT_LEN	16ul
+#define TASK_TXT_LEN	16ul
 
-/********************** internal data declaration ****************************/
+/* Events of Statechart */
+typedef enum sys_ev {EV_SYS_OFF = EV_BTN_UP,
+					 EV_SYS_ON = EV_BTN_DOWN,
+					 EV_SYS_BLINK,
+					 EV_SYS_NONE} sys_ev_t;
 
-/********************** internal functions declaration ***********************/
+/* States of Statechart */
+typedef enum sys_st {ST_SYS_IDLE,
+					 ST_SYS_SHORT_PUSH} sys_st_t;
 
-/********************** internal data definition *****************************/
+/********************** typedef **********************************************/
+/* Structure of Statechart */
+typedef struct
+{
+	sys_st_t		state;
+	sys_ev_t		ev_in;
+	TickType_t		tick;
+	sys_ev_t 		ev_out;
+	TickType_t	 	tick_out;
+	uint8_t 		btn_id;
+	TickType_t	    timeout_a;
+	TickType_t	    timeout_b;
+} sys_sc_t;
+
+/* Structure of AO */
+typedef struct {
+	QueueHandle_t	h_queue;
+	char			queue_txt[QUEUE_TXT_LEN];
+	TaskHandle_t	h_task;
+	char			task_txt[TASK_TXT_LEN];
+} sys_ao_t;
+
+/* Structure of data */
+typedef struct {
+	sys_ev_t sys_ev;
+	TickType_t tick;
+	uint8_t btn_id;
+} sys_dta_t;
+
+/* Structure of Task */
+typedef struct
+{
+	sys_sc_t *	sys_sc;
+	sys_ao_t * sys_ao;
+	sys_dta_t * sys_dta;
+} h_sys_t;
+
+
 
 /********************** external data declaration ****************************/
 
-/********************** external functions definition ************************/
-/* Interface functions */
-void open_btn_ao(h_btn_t *h_btn_)
-{
-	BaseType_t ret = xTaskCreate(task_btn,
-    				 h_btn_->btn_ao->task_txt,
-					 (configMINIMAL_STACK_SIZE),
-					 (void *)h_btn_,
-					 (tskIDLE_PRIORITY + 1ul),
-					 &h_btn_->btn_ao->h_task);
+/********************** external functions declaration ***********************/
 
-    configASSERT(pdPASS == ret);
+/********************** End of CPP guard *************************************/
+#ifdef __cplusplus
 }
+#endif
 
-void release_btn_ao(h_btn_t *h_btn_)
-{
-    vQueueUnregisterQueue(h_btn_->btn_ao->h_queue);
-	vQueueDelete(h_btn_->btn_ao->h_queue);
-
-	vTaskDelete(h_btn_->btn_ao->h_task);
-}
-
-BaseType_t send_btn_ao(h_btn_t *h_btn_, void *event_){
-	UNUSED(h_btn_);
-	UNUSED(event_);
-	return pdPASS;
-}
-
-void ioctl_btn_ao(h_btn_t *h_btn_)
-{
-	/* Prevent unused argument(s) compilation warning */
-	UNUSED(h_btn_);
-}
+#endif /* TASK_SYS_ATTRIBUTE_H_ */
 
 /********************** end of file ******************************************/

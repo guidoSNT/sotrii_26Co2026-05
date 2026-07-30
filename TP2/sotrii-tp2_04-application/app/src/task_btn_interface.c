@@ -64,12 +64,12 @@
 /* Interface functions */
 void open_btn_ao(h_btn_t *h_btn_)
 {
-	BaseType_t ret = xTaskCreate(task_btn,
-    				 h_btn_->btn_ao->task_txt,
-					 (configMINIMAL_STACK_SIZE),
-					 (void *)h_btn_,
-					 (tskIDLE_PRIORITY + 1ul),
-					 &h_btn_->btn_ao->h_task);
+	BaseType_t ret =  xTaskCreate(task_btn,
+    				  h_btn_->btn_ao->task_txt,
+					  (configMINIMAL_STACK_SIZE),
+					  (void *)h_btn_,
+					  (tskIDLE_PRIORITY + 1ul),
+					  &h_btn_->btn_ao->h_task);
 
     configASSERT(pdPASS == ret);
 }
@@ -83,9 +83,7 @@ void release_btn_ao(h_btn_t *h_btn_)
 }
 
 BaseType_t send_btn_ao(h_btn_t *h_btn_, void *event_){
-	UNUSED(h_btn_);
-	UNUSED(event_);
-	return pdPASS;
+	return xQueueSend((QueueHandle_t)h_btn_->btn_ao->h_queue, event_, (TickType_t)ZERO);
 }
 
 void ioctl_btn_ao(h_btn_t *h_btn_)

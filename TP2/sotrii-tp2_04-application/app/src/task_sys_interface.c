@@ -45,13 +45,12 @@
 #include "board.h"
 #include "app.h"
 #include "app_it.h"
-#include "task_btn.h"
-#include "task_btn_attribute.h"
+#include "task_sys.h"
+#include "task_sys_attribute.h"
 
 /********************** macros and definitions *******************************/
 #define QUEUE_LENGTH_       (5)
-#define QUEUE_ITEM_SIZE_    (sizeof(btn_ev_t))
-
+#define QUEUE_ITEM_SIZE_    (sizeof(sys_dta_t))
 /********************** internal data declaration ****************************/
 
 /********************** internal functions declaration ***********************/
@@ -62,36 +61,58 @@
 
 /********************** external functions definition ************************/
 /* Interface functions */
-void open_btn_ao(h_btn_t *h_btn_)
+void open_sys_ao(h_sys_t *h_sys_)
 {
-	BaseType_t ret = xTaskCreate(task_btn,
-    				 h_btn_->btn_ao->task_txt,
-					 (configMINIMAL_STACK_SIZE),
-					 (void *)h_btn_,
-					 (tskIDLE_PRIORITY + 1ul),
-					 &h_btn_->btn_ao->h_task);
+	/* Before a queue or semaphore (binary or counting) or mutex is used it must
+     * be explicitly created.
+	 *
+	 * Check the queue or semaphore (binary or counting) or mutex was created
+     * successfully.
+     *
+     * Add queue or semaphore (binary or counting) or mutex to registry. */
+	h_sys_->sys_ao->h_queue = xQueueCreate(QUEUE_LENGTH_, QUEUE_ITEM_SIZE_);
+	configASSERT(NULL != h_sys_->sys_ao->h_queue);
+	vQueueAddToRegistry(h_sys_->sys_ao->h_queue, h_sys_->sys_ao->queue_txt);
 
+	/* Add threads, ... */
+    BaseType_t ret;
+
+    /* Task LED thread at priority 1 */
+	ret = xTaskCreate(task_sys,							/* Pointer to the function thats implement the task. */
+					  h_sys_->sys_ao->task_txt,			/* Text name for the task. This is to facilitate debugging only. */
+					  (configMINIMAL_STACK_SIZE),		/* Stack depth in words. */
+					  (void *)h_sys_,					/* We are using the task parameter. */
+					  (tskIDLE_PRIORITY + 1ul),			/* This task will run at priority 1. */
+					  &h_sys_->sys_ao->h_task);			/* We are using a variable as task handle. */
+
+    /* Check the thread was created successfully. */
     configASSERT(pdPASS == ret);
+
+    /* Total amount of heap space that remains unallocated. Is also available
+     * with xFreeBytesRemaining variable for heap management schemes 2 to 5.
+     * Memory array used by heap_4 is specified as:
+     * uint8_t ucHeap[configTOTAL_HEAP_SIZE]; */
+    ret = xPortGetFreeHeapSize();
 }
 
-void release_btn_ao(h_btn_t *h_btn_)
+void release_sys_ao(h_sys_t *h_sys_)
 {
-    vQueueUnregisterQueue(h_btn_->btn_ao->h_queue);
-	vQueueDelete(h_btn_->btn_ao->h_queue);
+    vQueueUnregisterQueue(h_sys_->sys_ao->h_queue);
+	vQueueDelete(h_sys_->sys_ao->h_queue);
 
-	vTaskDelete(h_btn_->btn_ao->h_task);
+	vTaskDelete(h_sys_->sys_ao->h_task);
 }
 
-BaseType_t send_btn_ao(h_btn_t *h_btn_, void *event_){
-	UNUSED(h_btn_);
-	UNUSED(event_);
-	return pdPASS;
+BaseType_t send_sys_ao(h_sys_t *h_sys_, sys_ev_t event_, TickType_t tick_out, uint8_t btn_id){
+	sys_dta_t sys_dta = {event_, tick_out, btn_id};
+
+	return xQueueSend((QueueHandle_t)h_sys_->sys_ao->h_queue, &sys_dta, (TickType_t)ZERO);
 }
 
-void ioctl_btn_ao(h_btn_t *h_btn_)
-{
-	/* Prevent unused argument(s) compilation warning */
-	UNUSED(h_btn_);
+
+void ioctl_sys_ao(h_sys_t *h_sys_) {
+
+	UNUSED(h_sys_);
 }
 
 /********************** end of file ******************************************/

@@ -33,24 +33,19 @@
  */
 
 /********************** inclusions *******************************************/
-/* Project includes */
+/* Project includes. */
 #include "main.h"
 #include "cmsis_os.h"
 
-/* Demo includes */
+/* Demo includes. */
 #include "logger.h"
 #include "dwt.h"
 
-/* Application & Tasks includes */
+/* Application & Tasks includes. */
 #include "board.h"
 #include "app.h"
-#include "app_it.h"
-#include "task_btn.h"
-#include "task_btn_attribute.h"
 
 /********************** macros and definitions *******************************/
-#define QUEUE_LENGTH_       (5)
-#define QUEUE_ITEM_SIZE_    (sizeof(btn_ev_t))
 
 /********************** internal data declaration ****************************/
 
@@ -58,40 +53,54 @@
 
 /********************** internal data definition *****************************/
 
-/********************** external data declaration ****************************/
+/********************** external data declaration *****************************/
 
 /********************** external functions definition ************************/
-/* Interface functions */
-void open_btn_ao(h_btn_t *h_btn_)
+/* Hook Functions */
+void vApplicationIdleHook(void)
 {
-	BaseType_t ret = xTaskCreate(task_btn,
-    				 h_btn_->btn_ao->task_txt,
-					 (configMINIMAL_STACK_SIZE),
-					 (void *)h_btn_,
-					 (tskIDLE_PRIORITY + 1ul),
-					 &h_btn_->btn_ao->h_task);
+	/* The idle task can optionally call an application defined hook (or callback)
+	   function - the idle hook. The idle task runs at the very lowest priority,
+	   so such an idle hook function will only get executed when there are no tasks
+	   of higher priority that are able to run. This makes the idle hook function
+	   an ideal place to put the processor into a low power state - providing an
+	   automatic power saving whenever there is no processing to be performed.
+	   The idle hook will only get called if configUSE_IDLE_HOOK is set to 1
+	   https://www.freertos.org/a00016.html
+	   The idle hook is called repeatedly as long as the idle task is running. It
+	   is paramount that the idle hook function does not call any API functions
+	   that could cause it to block.*/
 
-    configASSERT(pdPASS == ret);
+	/* Update Task Idle Counter */
+	g_task_idle_cnt++;
 }
 
-void release_btn_ao(h_btn_t *h_btn_)
+void vApplicationTickHook(void)
 {
-    vQueueUnregisterQueue(h_btn_->btn_ao->h_queue);
-	vQueueDelete(h_btn_->btn_ao->h_queue);
+	/* The tick interrupt can optionally call an application defined hook (or callback)
+	   function - the tick hook.
+	   The tick hook will only get called if configUSE_TICK_HOOK is set to 1
+	   https://www.freertos.org/a00016.html
+	   vApplicationTickHook() executes from within an ISR so must be very short, not use
+	   much stack, and not call any API functions that don't end in "FromISR" or "FROM_ISR".*/
 
-	vTaskDelete(h_btn_->btn_ao->h_task);
+	/* Update Application Tick Counter */
+	g_app_tick_cnt++;
 }
 
-BaseType_t send_btn_ao(h_btn_t *h_btn_, void *event_){
-	UNUSED(h_btn_);
-	UNUSED(event_);
-	return pdPASS;
-}
-
-void ioctl_btn_ao(h_btn_t *h_btn_)
+void vApplicationStackOverflowHook(xTaskHandle xTask, signed char *pcTaskName)
 {
-	/* Prevent unused argument(s) compilation warning */
-	UNUSED(h_btn_);
+	/* Run time stack overflow checking is performed if
+	   configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
+	   called if a stack overflow is detected.
+	   https://www.freertos.org/Stacks-and-stack-overflow-checking.html */
+
+    taskENTER_CRITICAL();
+    configASSERT( 0 );   /* hang the execution for debugging purposes */
+    taskEXIT_CRITICAL();
+
+	/* Update Application Stack Overflow Counter */
+    g_app_stack_overflow_cnt++;
 }
 
 /********************** end of file ******************************************/

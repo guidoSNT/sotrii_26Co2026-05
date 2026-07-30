@@ -35,22 +35,8 @@
 /********************** inclusions *******************************************/
 /* Project includes */
 #include "main.h"
-#include "cmsis_os.h"
-
-/* Demo includes */
-#include "logger.h"
-#include "dwt.h"
-
-/* Application & Tasks includes */
-#include "board.h"
-#include "app.h"
-#include "app_it.h"
-#include "task_btn.h"
-#include "task_btn_attribute.h"
 
 /********************** macros and definitions *******************************/
-#define QUEUE_LENGTH_       (5)
-#define QUEUE_ITEM_SIZE_    (sizeof(btn_ev_t))
 
 /********************** internal data declaration ****************************/
 
@@ -61,37 +47,45 @@
 /********************** external data declaration ****************************/
 
 /********************** external functions definition ************************/
-/* Interface functions */
-void open_btn_ao(h_btn_t *h_btn_)
+/* Provides a blocking delay in microseconds using the SysTick timer */
+void systick_delay_us(uint32_t delay_us)
 {
-	BaseType_t ret = xTaskCreate(task_btn,
-    				 h_btn_->btn_ao->task_txt,
-					 (configMINIMAL_STACK_SIZE),
-					 (void *)h_btn_,
-					 (tskIDLE_PRIORITY + 1ul),
-					 &h_btn_->btn_ao->h_task);
+	uint32_t start, current, target, elapsed;
 
-    configASSERT(pdPASS == ret);
-}
+    if (0 == delay_us)
+    	return;
 
-void release_btn_ao(h_btn_t *h_btn_)
-{
-    vQueueUnregisterQueue(h_btn_->btn_ao->h_queue);
-	vQueueDelete(h_btn_->btn_ao->h_queue);
+    /* Get the start value of the SysTick counter */
+	start = SysTick->VAL;
 
-	vTaskDelete(h_btn_->btn_ao->h_task);
-}
+	/* Calculate the total number of SysTick counts required for the delay */
+	target = delay_us * (SystemCoreClock / 1000000UL);
 
-BaseType_t send_btn_ao(h_btn_t *h_btn_, void *event_){
-	UNUSED(h_btn_);
-	UNUSED(event_);
-	return pdPASS;
-}
+    /* Loop until the required counts have elapsed */
+    while (1)
+    {
+        /* Get the current value of the SysTick counter */
+    	current = SysTick->VAL;
 
-void ioctl_btn_ao(h_btn_t *h_btn_)
-{
-	/* Prevent unused argument(s) compilation warning */
-	UNUSED(h_btn_);
+        /* Handle the case where the SysTick counter wraps around, */
+        /* counts down to 0 and reloads */
+        if (current <= start)
+        {
+        	elapsed = start - current;
+        }
+        else
+        {
+            /* Counter wrapped around, */
+        	/* add the reload value to account for the wrap */
+        	elapsed = SysTick->LOAD + start - current;
+        }
+
+        /* Exit the loop when the desired delay is reached */
+        if (elapsed >= target)
+        {
+        	break;
+        }
+    }
 }
 
 /********************** end of file ******************************************/
