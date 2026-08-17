@@ -18,15 +18,14 @@ $$H = T_m = \text{mcm}(4,5,20) = 20$$
 
 ### Periodo secundario
 
-$$T_s = \text{mcd}(4,5,20) = 1 \rightarrow \text{elijo } 5$$
+$$T_s = \text{mcd}(4,5,20) = 1 \rightarrow \text{elijo } 5 \text{ que es divisor del } T_m$$
 
 ### Test de garantía
 
 1. $T_s = 5 \geq \max(C) = 5 \Rightarrow$ **CUMPLE**
 2. $U = 0{,}9 \leq 1 \Rightarrow$ **CUMPLE**
 3. $T_m = \text{mcm}(4,5,20) = 20 \Rightarrow$ **CUMPLE**
-4. $T_i = k \cdot T_s,\ k \in \mathbb{N}$. Como el período secundario es 5, no existe ningún número entero $k$ que multiplicado por el $T_s$ dé los períodos 4, 5 y 20.
-5. $2T_s - \text{mcd}(T_s, T_i) \leq T_i$:
+4. $2T_s - \text{mcd}(T_s, T_i) \leq T_i$:
 
    | Tarea | Cálculo                                    |   Resultado   |
    | :---- | :----------------------------------------- | :-----------: |
@@ -65,11 +64,7 @@ $$T_s = \text{mcd}(6, 10, 18) = 2$$
 1. $T_s = 2 \geq \max(C) = 2 \Rightarrow$ **CUMPLE**
 2. $U = 0{,}478 \leq 1 \Rightarrow$ **CUMPLE**
 3. $T_m = \text{mcm}(6, 10, 18) = 90 \Rightarrow$ **CUMPLE**
-4. $T_i = k \cdot T_s,\ k \in \mathbb{N}$:
-   - $T_s \cdot 3 = T_1 = 6$
-   - $T_s \cdot 5 = T_2 = 10$
-   - $T_s \cdot 9 = T_3 = 18$
-5. $2T_s - \text{mcd}(T_s, T_i) \leq T_i$:
+4. $2T_s - \text{mcd}(T_s, T_i) \leq T_i$:
 
    | Tarea | Cálculo                                    | Resultado |
    | :---- | :----------------------------------------- | :-------: |
@@ -102,29 +97,26 @@ $$H = T_m = \text{mcm}(8, 15, 20, 22) = 1320$$
 
 ### Periodo secundario
 
-$$T_s = \text{mcd}(8, 15, 20, 22) = 1 \rightarrow \text{elijo } 6$$
+$$T_s = \text{mcd}(8, 15, 20, 22) = 1 \rightarrow \text{elijo } 8$$
 
 ### Test de garantía
 
 1. $T_s = 6 \geq \max(C) = 6 \Rightarrow$ **CUMPLE**
 2. $U = 0{,}797 \leq 1 \Rightarrow$ **CUMPLE**
 3. $T_m = \text{mcm}(8, 15, 20, 22) = 1320 \Rightarrow$ **CUMPLE**
-4. $T_i = k \cdot T_s,\ k \in \mathbb{N} \Rightarrow$ **No cumple**, ya que 8 no es múltiplo de 6.
-5. $2T_s - \text{mcd}(T_s, T_i) \leq T_i$:
+4. $2T_s - \text{mcd}(T_s, T_i) \leq T_i$:
 
-   | Tarea | Cálculo                                     |   Resultado   |
-   | :---- | :------------------------------------------ | :-----------: |
-   | T1    | $2 \cdot 6 - \text{mcd}(6,8) = 10 \leq 8$   | **NO CUMPLE** |
-   | T2    | $2 \cdot 6 - \text{mcd}(6,15) = 9 \leq 15$  |    CUMPLE     |
-   | T3    | $2 \cdot 6 - \text{mcd}(6,20) = 10 \leq 20$ |    CUMPLE     |
-   | T4    | $2 \cdot 6 - \text{mcd}(6,22) = 10 \leq 22$ |    CUMPLE     |
+   | Tarea | Cálculo                                     | Resultado |
+   | :---- | :------------------------------------------ | :-------: |
+   | T1    | $2 \cdot 8 - \text{mcd}(8,8) = 8 \leq 8$    |  CUMPLE   |
+   | T2    | $2 \cdot 8 - \text{mcd}(8,15) = 15 \leq 15$ |  CUMPLE   |
+   | T3    | $2 \cdot 8 - \text{mcd}(8,20) = 12 \leq 20$ |  CUMPLE   |
+   | T4    | $2 \cdot 8 - \text{mcd}(8,22) = 14 \leq 22$ |  CUMPLE   |
 
-**Este sistema no cumple por la condición 4.**
+Este sistema si cumple el test de garantia.
 
-Al igual que el sistema 1, se incluyo un segmento del hiperperiodo:
+Debido a la longitud del hiperperiodo se incluyo solo un segmento del diagrama de Gantt:
 ![img_3](images/sys3.png)
-
-Aunque no se observa directamente, este sistema tampoco cumple.
 
 ## Sistema 4
 
@@ -152,8 +144,7 @@ $$T_s = \text{mcd}(4, 5, 10, 24) = 1 \rightarrow \text{elijo } 9 \text{ para sat
 1. $T_s = 9 \geq \max(C) = 9 \Rightarrow$ **CUMPLE**
 2. $U = 0{,}9 \leq 1 \Rightarrow$ **CUMPLE**
 3. $T_m = \text{mcm}(4, 5, 10, 24) = 120 \Rightarrow$ **CUMPLE**
-4. $T_i = k \cdot T_s,\ k \in \mathbb{N} \Rightarrow$ **No cumple**, porque ninguno de los períodos es múltiplo de $T_s$.
-5. $2T_s - \text{mcd}(T_s, T_i) \leq T_i$:
+4. $2T_s - \text{mcd}(T_s, T_i) \leq T_i$:
 
    | Tarea | Cálculo                                     |   Resultado   |
    | :---- | :------------------------------------------ | :-----------: |
@@ -164,7 +155,7 @@ $$T_s = \text{mcd}(4, 5, 10, 24) = 1 \rightarrow \text{elijo } 9 \text{ para sat
 
 **Este sistema no cumple por la condición 4.**
 
-Al igual que el sistema 1 y 3, se incluyo un segmento del hiperperiodo:
+Al igual que el sistema 3 se incluyo un segmento del hiperperiodo:
 ![img_4](images/sys4.png)
 En este se observa como la ejecucion de la tarea 4 tambien tiene un periodo largo de ejecucion que no se puede colocar en ningun espacio. Al igual que el sistema 1, se deberia subdividir.
 
