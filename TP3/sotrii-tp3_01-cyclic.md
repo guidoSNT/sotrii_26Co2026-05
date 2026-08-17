@@ -165,3 +165,5 @@ Cabe aclarar que en este caso como la tarea 1 tiene tiempo de ejecución 0.5, ca
 # Modificaciones para usar con FreeRTOS
 
 Para poder usar esto con FreeRTOS, se debe deshabilitar `USE_PREEMPTION`, que es un `#define` del `FreeRTOS_config.h`, aunque desde STM32CubeIDE se puede hacer desde el IOC.
+
+Por otro lado luego del procesamiento de cada tarea, se debe llamar a taskYIELD() para que se ceda la ejecución a la siguiente tarea.
