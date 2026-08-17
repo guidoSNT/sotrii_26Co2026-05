@@ -180,8 +180,8 @@ $$\omega_4 \le D_4 \ (19.5 \le 24) \rightarrow \textbf{Planificable}$$
 
 Para configurar `FreeRTOS`, se puede modificar `FreeRTOSConfig.h` con las siguientes modificaciones:
 
-- Al igual que antes habilitar `configUSE_PREEMPTION`.
+- Habilitar `configUSE_PREEMPTION` ya que no es cooperativo.
 - Deshabilitar el slicing con tareas de la misma prioridad con `configUSE_TIME_SLICING` en 0.
-- Luego del procesamiento de cada tarea, se debe llamar a `taskYIELD()` para que se ceda la ejecución a la siguiente tarea.
+- Luego del procesamiento de cada tarea, se debe llamar a `vTaskDelayUntil()` para asegurar el cumplimiento de los periodos.
 
 Además se podría modificar la máxima cantidad de prioridades, aunque no es estrictamente necesario.
