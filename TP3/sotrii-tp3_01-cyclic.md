@@ -10,28 +10,35 @@
 
 ### Factor de uso
 
-U = 1/4 + 2/5 + 5/20 = 0,9
+$$U = \frac{1}{4} + \frac{2}{5} + \frac{5}{20} = 0{,}9$$
 
 ### Hiperperiodo
 
-H = T_m = mcm(4,5,20) = 20
+$$H = T_m = \text{mcm}(4,5,20) = 20$$
 
 ### Periodo secundario
 
-T_s = mcd(4,5,20) = 1 -> eligo 5
+$$T_s = \text{mcd}(4,5,20) = 1 \rightarrow \text{elijo } 5$$
 
-### Test de garantia
+### Test de garantía
 
-1. T_s = 5 >= max(C) = 5 => CUMPLE
-2. U = 0,9 <= 1 => CUMPLE
-3. T_m = mcm(4,5,20) = 20 => CUMPLE
-4. T_i = k T_s / k e N. Como el periodo secundario es 1, no existe ningun numero entero k que multiplicado por el T_s de los periodos 4, 5 y 20.
-5. 2 T_s - mcd(T_s,T_i) <= T_i:
-   T1: 2 * 5 - mcd(5,4) = 9 <= 4 -> NO CUMPLE
-   T2: 2 * 5 - mcd(5,5) = 5 <= 5 -> CUMPLE
-   T3: 2 * 5 - mcd(5,20) = 5 <= 20 -> CUMPLE
+1. $T_s = 5 \geq \max(C) = 5 \Rightarrow$ **CUMPLE**
+2. $U = 0{,}9 \leq 1 \Rightarrow$ **CUMPLE**
+3. $T_m = \text{mcm}(4,5,20) = 20 \Rightarrow$ **CUMPLE**
+4. $T_i = k \cdot T_s,\ k \in \mathbb{N}$. Como el período secundario es 5, no existe ningún número entero $k$ que multiplicado por el $T_s$ dé los períodos 4, 5 y 20.
+5. $2T_s - \text{mcd}(T_s, T_i) \leq T_i$:
 
-No cumple por condicion 1.
+   | Tarea | Cálculo                                    |   Resultado   |
+   | :---- | :----------------------------------------- | :-----------: |
+   | T1    | $2 \cdot 5 - \text{mcd}(5,4) = 9 \leq 4$   | **NO CUMPLE** |
+   | T2    | $2 \cdot 5 - \text{mcd}(5,5) = 5 \leq 5$   |    CUMPLE     |
+   | T3    | $2 \cdot 5 - \text{mcd}(5,20) = 5 \leq 20$ |    CUMPLE     |
+
+**No cumple por condición 4.**
+
+Se puede ver el porque no cumple simplemente con un grafico aproximado de Gantt:
+![img_1](images/sys1_2.png)
+Se observa como la tarea 3 no tiene ningun espacio de 5 donde pueda entrar correctamente. Se podria hacer si la tarea 3 se separa en segmentos mas pequeños.
 
 ## Sistema 2
 
@@ -43,28 +50,38 @@ No cumple por condicion 1.
 
 ### Factor de uso
 
-U = 1/6 + 2/10 + 2/18 = 0,478
+$$U = \frac{1}{6} + \frac{2}{10} + \frac{2}{18} = 0{,}478$$
 
 ### Hiperperiodo
 
-H = T_m = mcm(6, 10, 18) = 90
+$$H = T_m = \text{mcm}(6, 10, 18) = 90$$
 
 ### Periodo secundario
 
-T_s = mcd(6, 10, 18) = 2
+$$T_s = \text{mcd}(6, 10, 18) = 2$$
 
-### Test de garantia
+### Test de garantía
 
-1. T_s = 2 >= max(C) = 2 => CUMPLE
-2. U = 0,478 <= 1 => CUMPLE
-3. T_m = mcm(6, 10, 18) = 90 => CUMPLE
-4. T_i = k T_s / k e N => (T_s * 3 = T_1 = 6 , T_s * 5 = T_2 = 10, T_s * 9 = T_3 = 18)
-5. 2 T_s - mcd(T_s,T_i) <= T_i:
-   T1: 2 * 2 - mcd(2, 6) = 2 <= 6 -> Cumple
-   T2: 2 * 2 - mcd(2, 10) = 2 <= 10 -> Cumple
-   T3: 2 * 2 - mcd(2, 18) = 2 <= 18 -> Cumple
+1. $T_s = 2 \geq \max(C) = 2 \Rightarrow$ **CUMPLE**
+2. $U = 0{,}478 \leq 1 \Rightarrow$ **CUMPLE**
+3. $T_m = \text{mcm}(6, 10, 18) = 90 \Rightarrow$ **CUMPLE**
+4. $T_i = k \cdot T_s,\ k \in \mathbb{N}$:
+   - $T_s \cdot 3 = T_1 = 6$
+   - $T_s \cdot 5 = T_2 = 10$
+   - $T_s \cdot 9 = T_3 = 18$
+5. $2T_s - \text{mcd}(T_s, T_i) \leq T_i$:
 
-Este sistema si cumple el test de garantia.
+   | Tarea | Cálculo                                    | Resultado |
+   | :---- | :----------------------------------------- | :-------: |
+   | T1    | $2 \cdot 2 - \text{mcd}(2,6) = 2 \leq 6$   |  CUMPLE   |
+   | T2    | $2 \cdot 2 - \text{mcd}(2,10) = 2 \leq 10$ |  CUMPLE   |
+   | T3    | $2 \cdot 2 - \text{mcd}(2,18) = 2 \leq 18$ |  CUMPLE   |
+
+**Este sistema sí cumple el test de garantía.**
+
+La siguiente imagen tiene el Gantt de el hiperciclo completo donde no se superpone ninguna tarea:
+![img_2](images/sys2.png)
+Como se puede ver, los "picos" representan cuando se termina el periodo de cada tarea. Sino esta presente el pico es porque el siguiente bloque de ejecucion representa el comienzo del nuevo ciclo.
 
 ## Sistema 3
 
@@ -77,29 +94,37 @@ Este sistema si cumple el test de garantia.
 
 ### Factor de uso
 
-U = 1/8 + 3/15 + 4/20 + 6/22 = 0,797
+$$U = \frac{1}{8} + \frac{3}{15} + \frac{4}{20} + \frac{6}{22} = 0{,}797$$
 
 ### Hiperperiodo
 
-H = T_m = mcm(8, 15, 20, 22) = 1320
+$$H = T_m = \text{mcm}(8, 15, 20, 22) = 1320$$
 
 ### Periodo secundario
 
-T_s = mcd(8, 15, 20, 22) = 1 -> Eligo 6
+$$T_s = \text{mcd}(8, 15, 20, 22) = 1 \rightarrow \text{elijo } 6$$
 
-### Test de garantia
+### Test de garantía
 
-1. T_s = 6 >= max(C) = 6 => CUMPLE
-2. U = 0,797 <= 1 => CUMPLE
-3. T_m = mcm(8, 15, 20, 22) = 1320 => CUMPLE
-4. T_i = k T_s / k e N => No cumple ya que 8 no es multiplo de 6
-5. 2 T_s - mcd(T_s,T_i) <= T_i:
-   T1: 2 * 1 - mcd(1, 8) = 1 <= 8 -> Cumple
-   T2: 2 * 1 - mcd(1, 15) = 1 <= 15 -> Cumple
-   T3: 2 * 1 - mcd(1, 20) = 1 <= 20 -> Cumple
-   T4: 2 * 1 - mcd(1, 22) = 1 <= 22 -> Cumple
+1. $T_s = 6 \geq \max(C) = 6 \Rightarrow$ **CUMPLE**
+2. $U = 0{,}797 \leq 1 \Rightarrow$ **CUMPLE**
+3. $T_m = \text{mcm}(8, 15, 20, 22) = 1320 \Rightarrow$ **CUMPLE**
+4. $T_i = k \cdot T_s,\ k \in \mathbb{N} \Rightarrow$ **No cumple**, ya que 8 no es múltiplo de 6.
+5. $2T_s - \text{mcd}(T_s, T_i) \leq T_i$:
 
-Este sistema no cumple por la condicion 1.
+   | Tarea | Cálculo                                     |   Resultado   |
+   | :---- | :------------------------------------------ | :-----------: |
+   | T1    | $2 \cdot 6 - \text{mcd}(6,8) = 10 \leq 8$   | **NO CUMPLE** |
+   | T2    | $2 \cdot 6 - \text{mcd}(6,15) = 9 \leq 15$  |    CUMPLE     |
+   | T3    | $2 \cdot 6 - \text{mcd}(6,20) = 10 \leq 20$ |    CUMPLE     |
+   | T4    | $2 \cdot 6 - \text{mcd}(6,22) = 10 \leq 22$ |    CUMPLE     |
+
+**Este sistema no cumple por la condición 4.**
+
+Al igual que el sistema 1, se incluyo un segmento del hiperperiodo:
+![img_3](images/sys3.png)
+
+Aunque no se observa directamente, este sistema tampoco cumple.
 
 ## Sistema 4
 
@@ -112,30 +137,37 @@ Este sistema no cumple por la condicion 1.
 
 ### Factor de uso
 
-U = 0,5/4 + 1/5 + 2/10 + 9/24 = 0,9
+$$U = \frac{0{,}5}{4} + \frac{1}{5} + \frac{2}{10} + \frac{9}{24} = 0{,}9$$
 
 ### Hiperperiodo
 
-H = T_m = mcm(4, 5, 10, 24) = 120
+$$H = T_m = \text{mcm}(4, 5, 10, 24) = 120$$
 
 ### Periodo secundario
 
-T_s = mcd(4, 5, 10, 24) = 1 -> Eligo 9 para satifacer condicion 1
+$$T_s = \text{mcd}(4, 5, 10, 24) = 1 \rightarrow \text{elijo } 9 \text{ para satisfacer condición 1}$$
 
-### Test de garantia
+### Test de garantía
 
-1. T_s = 9 >= max(C) = 9 => CUMPLE
-2. U = 0,9 <= 1 => CUMPLE
-3. T_m = mcm(4, 5, 10, 24) = 120 => CUMPLE
-4. T_i = k T_s / k e N => No cumple porque ningun de los periodos es multiplo de T_s
-5. 2 T_s - mcd(T_s,T_i) <= T_i:
-   T1: 2 * 9 - mcd(9, 4) = 17 <= 3 -> No cumple
-   T2: 2 * 9 - mcd(9, 5) = 17 <= 5 -> No cumple
-   T3: 2 * 9 - mcd(9, 10) = 17 <= 10 -> No cumple
-   T4: 2 * 9 - mcd(9, 24) = 15 <= 24 -> Cumple
+1. $T_s = 9 \geq \max(C) = 9 \Rightarrow$ **CUMPLE**
+2. $U = 0{,}9 \leq 1 \Rightarrow$ **CUMPLE**
+3. $T_m = \text{mcm}(4, 5, 10, 24) = 120 \Rightarrow$ **CUMPLE**
+4. $T_i = k \cdot T_s,\ k \in \mathbb{N} \Rightarrow$ **No cumple**, porque ninguno de los períodos es múltiplo de $T_s$.
+5. $2T_s - \text{mcd}(T_s, T_i) \leq T_i$:
 
-Este sistema no cumple por la condicion 4.
+   | Tarea | Cálculo                                     |   Resultado   |
+   | :---- | :------------------------------------------ | :-----------: |
+   | T1    | $2 \cdot 9 - \text{mcd}(9,4) = 17 \leq 3$   | **NO CUMPLE** |
+   | T2    | $2 \cdot 9 - \text{mcd}(9,5) = 17 \leq 5$   | **NO CUMPLE** |
+   | T3    | $2 \cdot 9 - \text{mcd}(9,10) = 17 \leq 10$ | **NO CUMPLE** |
+   | T4    | $2 \cdot 9 - \text{mcd}(9,24) = 15 \leq 24$ |    CUMPLE     |
+
+**Este sistema no cumple por la condición 4.**
+
+Al igual que el sistema 1 y 3, se incluyo un segmento del hiperperiodo:
+![img_4](images/sys4.png)
+En este se observa como la ejecucion de la tarea 4 tambien tiene un periodo largo de ejecucion que no se puede colocar en ningun espacio. Al igual que el sistema 1, se deberia subdividir.
 
 # Modificaciones para usar con FreeRTOS
 
-Para poder usar esto con FreeRTOS, se debe deshabilitar `USE_PREEMPTION` que es un define del `FreeRTOS_config.h`, aunque desde STM32CubeIDE se pude hacer desde el IOC.
+Para poder usar esto con FreeRTOS, se debe deshabilitar `USE_PREEMPTION`, que es un `#define` del `FreeRTOS_config.h`, aunque desde STM32CubeIDE se puede hacer desde el IOC.
