@@ -159,6 +159,8 @@ Al igual que el sistema 3 se incluyo un segmento del hiperperiodo:
 ![img_4](images/sys4.png)
 En este se observa como la ejecucion de la tarea 4 tambien tiene un periodo largo de ejecucion que no se puede colocar en ningun espacio. Al igual que el sistema 1, se deberia subdividir.
 
+Cabe aclarar que en este caso como la tarea 1 tiene tiempo de ejecución 0.5, cada unidad de tiempo en este grafico representa media milesima.
+
 # Modificaciones para usar con FreeRTOS
 
 Para poder usar esto con FreeRTOS, se debe deshabilitar `USE_PREEMPTION`, que es un `#define` del `FreeRTOS_config.h`, aunque desde STM32CubeIDE se puede hacer desde el IOC.
