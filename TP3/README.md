@@ -2,12 +2,12 @@
 
 ## Trabajo Práctico N°: 3 - Task Scheduling
 
-### Cohorte-Grupo: . . . . .
-
-### Modelo de placa: . . . . .
+### Cohorte-Grupo: . . . . . CESE26Co2026 - 05
 
 ### Responsable de la entrega
+Potente, Guido
 
+### Alumnos
 | N° SIU | Apellidos, Nombres     |   Fecha    | Deadline  |
 | :----- | :--------------------- | :--------: | :-------: |
 | e2604  | Gianchino, Mauro Ariel | 15/08/2026 | Semana 08 |
