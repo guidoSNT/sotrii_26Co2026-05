@@ -10,7 +10,7 @@
 
 ### Factor de uso
 
-$$U = \frac{1}{4} + \frac{2}{5} + \frac{5}{20} = 0{,}9$$
+$$U = \frac{1}{4} + \frac{2}{5} + \frac{5}{20} = 0.9 \leq 1$$
 
 ### Hiperperiodo
 
@@ -22,8 +22,8 @@ $$T_s = \text{mcd}(4,5,20) = 1 \rightarrow \text{elijo } 5 \text{ que es divisor
 
 ### Test de garantía
 
-1. $T_s = 5 \geq \max(C) = 5 \Rightarrow$ **CUMPLE**
-2. $U = 0{,}9 \leq 1 \Rightarrow$ **CUMPLE**
+1. $T_s = 5 \geq \max(C_i) = 5 \Rightarrow$ **CUMPLE**
+2. $U = 0.9 \leq 1 \Rightarrow$ **CUMPLE**
 3. $T_m = \text{mcm}(4,5,20) = 20 \Rightarrow$ **CUMPLE**
 4. $2T_s - \text{mcd}(T_s, T_i) \leq T_i$:
 
@@ -49,7 +49,7 @@ Se observa como la tarea 3 no tiene ningun espacio de 5 donde pueda entrar corre
 
 ### Factor de uso
 
-$$U = \frac{1}{6} + \frac{2}{10} + \frac{2}{18} = 0{,}478$$
+$$U = \frac{1}{6} + \frac{2}{10} + \frac{2}{18} = 0.478 \leq 1$$
 
 ### Hiperperiodo
 
@@ -61,8 +61,8 @@ $$T_s = \text{mcd}(6, 10, 18) = 2$$
 
 ### Test de garantía
 
-1. $T_s = 2 \geq \max(C) = 2 \Rightarrow$ **CUMPLE**
-2. $U = 0{,}478 \leq 1 \Rightarrow$ **CUMPLE**
+1. $T_s = 2 \geq \max(C_i) = 2 \Rightarrow$ **CUMPLE**
+2. $U = 0.478 \leq 1 \Rightarrow$ **CUMPLE**
 3. $T_m = \text{mcm}(6, 10, 18) = 90 \Rightarrow$ **CUMPLE**
 4. $2T_s - \text{mcd}(T_s, T_i) \leq T_i$:
 
@@ -89,7 +89,7 @@ Como se puede ver, los "picos" representan cuando se termina el periodo de cada 
 
 ### Factor de uso
 
-$$U = \frac{1}{8} + \frac{3}{15} + \frac{4}{20} + \frac{6}{22} = 0{,}797$$
+$$U = \frac{1}{8} + \frac{3}{15} + \frac{4}{20} + \frac{6}{22} = 0.797 \leq 1$$
 
 ### Hiperperiodo
 
@@ -99,10 +99,11 @@ $$H = T_m = \text{mcm}(8, 15, 20, 22) = 1320$$
 
 $$T_s = \text{mcd}(8, 15, 20, 22) = 1 \rightarrow \text{elijo } 8$$
 
+Se eligio 8 porque logra cumplir la condición 4, no así como ocurre con el 6 que cumple la 1 pero no la 4.
 ### Test de garantía
 
-1. $T_s = 6 \geq \max(C) = 6 \Rightarrow$ **CUMPLE**
-2. $U = 0{,}797 \leq 1 \Rightarrow$ **CUMPLE**
+1. $T_s = 8 \geq \max(C_i) = 6 \Rightarrow$ **CUMPLE**
+2. $U = 0.797 \leq 1 \Rightarrow$ **CUMPLE**
 3. $T_m = \text{mcm}(8, 15, 20, 22) = 1320 \Rightarrow$ **CUMPLE**
 4. $2T_s - \text{mcd}(T_s, T_i) \leq T_i$:
 
@@ -129,7 +130,7 @@ Debido a la longitud del hiperperiodo se incluyo solo un segmento del diagrama d
 
 ### Factor de uso
 
-$$U = \frac{0{,}5}{4} + \frac{1}{5} + \frac{2}{10} + \frac{9}{24} = 0{,}9$$
+$$U = \frac{0{,}5}{4} + \frac{1}{5} + \frac{2}{10} + \frac{9}{24} = 0.9 \leq 1$$
 
 ### Hiperperiodo
 
@@ -141,8 +142,8 @@ $$T_s = \text{mcd}(4, 5, 10, 24) = 1 \rightarrow \text{elijo } 9 \text{ para sat
 
 ### Test de garantía
 
-1. $T_s = 9 \geq \max(C) = 9 \Rightarrow$ **CUMPLE**
-2. $U = 0{,}9 \leq 1 \Rightarrow$ **CUMPLE**
+1. $T_s = 9 \geq \max(C_i) = 9 \Rightarrow$ **CUMPLE**
+2. $U = 0.9 \leq 1 \Rightarrow$ **CUMPLE**
 3. $T_m = \text{mcm}(4, 5, 10, 24) = 120 \Rightarrow$ **CUMPLE**
 4. $2T_s - \text{mcd}(T_s, T_i) \leq T_i$:
 
@@ -159,7 +160,7 @@ Al igual que el sistema 3 se incluyo un segmento del hiperperiodo:
 ![img_4](images/sys4.png)
 En este se observa como la ejecucion de la tarea 4 tambien tiene un periodo largo de ejecucion que no se puede colocar en ningun espacio. Al igual que el sistema 1, se deberia subdividir.
 
-Cabe aclarar que en este caso como la tarea 1 tiene tiempo de ejecución 0.5, cada unidad de tiempo en este grafico representa media milesima.
+Cabe aclarar que en este caso como la tarea 1 tiene tiempo de ejecución 0.5, cada unidad de tiempo en este grafico representa media milesima de segundo.
 
 # Modificaciones para usar con FreeRTOS
 
